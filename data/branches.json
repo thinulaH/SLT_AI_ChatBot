@@ -1,0 +1,362 @@
+[
+    {
+        "name": "Maradana",
+        "latitude": 6.921984,
+        "longitude": 79.869949,
+        "address": "Marada Road, Colombo-08.",
+        "phone": "011 2692355, 011 2689408",
+        "email": "rukshane@slt.com.lk"
+    },
+    {
+        "name": "Havelock Town",
+        "latitude": 6.888448,
+        "longitude": 79.861276,
+        "address": "Dickmons Road, Colombo 05.",
+        "phone": "011 2502230, 011 2589240",
+        "email": "rtohk@slt.com.lk"
+    },
+    {
+        "name": "Slave Island",
+        "latitude": 6.921922,
+        "longitude": 79.853380,
+        "address": "None",
+        "phone": "None",
+        "email": "None"
+    },
+    {
+        "name": "Wattala",
+        "latitude": 6.988388,
+        "longitude": 79.893345,
+        "address": "Old Negombo Road, Hendala, Wattala.",
+        "phone": "011 2932231, 011 2931630",
+        "email": "dilanfdo@slt.com.lk"
+    },
+    {
+        "name": "Rathmalana",
+        "latitude": 6.812668,
+        "longitude": 79.881860,
+        "address": "Galle Road, Rathmalana.",
+        "phone": "011 2622230/31, 011 2605000",
+        "email": "rtorm@slt.com.lk"
+    },
+    {
+        "name": "Colombo Fort",
+        "latitude": 6.934204,
+        "longitude": 79.846551,
+        "address": "None",
+        "phone": "None",
+        "email": "None"
+    },
+    {
+        "name": "Kotte",
+        "latitude": 6.900860,
+        "longitude": 79.905224,
+        "address": "Kotte Road, Kotte.",
+        "phone": "011 2872230, 011 2868400",
+        "email": "imal@slt.com.lk"
+    },
+    {
+        "name": "Kelaniya",
+        "latitude": 6.958632,
+        "longitude": 79.894829,
+        "address": "Station Road, Kelaniya",
+        "phone": "011 2984555",
+        "email": "buddhikam@slt.com.lk"
+    },
+    {
+        "name": "Ratnapura",
+        "latitude": 6.680147,
+        "longitude": 80.407149,
+        "address": "Bandaranayake Mw, Ratnapura",
+        "phone": "045 2222231, 045 2223247",
+        "email": "jeevasiri@slt.com.lk"
+    },
+    {
+        "name": "Polonnaruwa",
+        "latitude": 7.94078,
+        "longitude": 81.00429,
+        "address": "Batticolai Road, Polonnaruwa",
+        "phone": "027 2222231, 027 2223231",
+        "email": "dileepank@slt.com.lk"
+    },
+    {
+        "name": "Panadura",
+        "latitude": 6.7149101,
+        "longitude": 79.9073193,
+        "address": "Galle Road, Panadura.",
+        "phone": "038 2232231, 038 2240000",
+        "email": "rtomph@slt.com.lk"
+    },
+    {
+        "name": "Matara",
+        "latitude": 5.94365,
+        "longitude": 80.549876,
+        "address": "Tangalle Road, Matara.",
+        "phone": "041 2222231, 041 2223311",
+        "email": "chanikas@slt.com.lk"
+    },
+    {
+        "name": "Trincomalee",
+        "latitude": 8.592200,
+        "longitude": 81.196793,
+        "address": "Inner harbour Road, Trincomalee.",
+        "phone": "026 2222231, 026 2222248",
+        "email": "muralis@slt.com.lk"
+    },
+    {
+        "name": "Kandy",
+        "latitude": 7.290776,
+        "longitude": 80.632641,
+        "address": "No 63, Kings’ Street, Kandy.",
+        "phone": "081-2222231, 081-2234300",
+        "email": "kasune@slt.com.lk"
+    },
+    {
+        "name": "Jaffna",
+        "latitude": 9.665689,
+        "longitude": 80.00924,
+        "address": "Pannai Road, Jaffna.",
+        "phone": "021 2222231, 021 2222248",
+        "email": "kopiram@slt.com.lk"
+    },
+    {
+        "name": "Matale",
+        "latitude": 7.4667,
+        "longitude": 80.6167,
+        "address": "Main Street, Matale.",
+        "phone": "066 2222231, 066 2213100",
+        "email": "prabhashani@slt.com.lk"
+    },
+    {
+        "name": "Mannar",
+        "latitude": 8.9818,
+        "longitude": 79.9168,
+        "address": "Main Road, Mannar.",
+        "phone": "023 2222231, 023 2232248",
+        "email": "koimar@slt.com.lk"
+    },
+    {
+        "name": "Gampaha",
+        "latitude": 7.08,
+        "longitude": 80.00,
+        "address": "Court Road, Gampaha.",
+        "phone": "033 2222231, 033 2226700",
+        "email": "dushyantha@slt.com.lk"
+    },
+    {
+        "name": "Galle",
+        "latitude": 6.0354158,
+        "longitude": 80.2175814,
+        "address": "Wackwella Road, Galle.",
+        "phone": "091 2222231, 091 2234231",
+        "email": "uiananda@slt.com.lk"
+    },
+    {
+        "name": "Chilaw",
+        "latitude": 7.5817476,
+        "longitude": 79.7961232,
+        "address": "Puttlam Road, Chilaw.",
+        "phone": "032 2222231, 032 2223232",
+        "email": "lakshan@slt.com.lk"
+    },
+    {
+        "name": "Batticaloa",
+        "latitude": 7.731,
+        "longitude": 81.6747,
+        "address": "Station Road, Baticaloa.",
+        "phone": "065 2222231, 065 2224431",
+        "email": "yoges@slt.com.lk"
+    },
+    {
+        "name": "Bandarawela",
+        "latitude": 6.8259,
+        "longitude": 80.9982,
+        "address": "Near Post Office, Bandarawela.",
+        "phone": "057 2222231, 057 2223444",
+        "email": "mohanku@slt.com.lk"
+    },
+    {
+        "name": "Badulla",
+        "latitude": 6.9934,
+        "longitude": 81.0550,
+        "address": "Lower Kings Street, Badulla.",
+        "phone": "055 2222231, 055 2223231",
+        "email": "None"
+    },
+    {
+        "name": "Awissawella",
+        "latitude": 6.9458,
+        "longitude": 80.2111,
+        "address": "Colombo Road, Awissawella.",
+        "phone": "036 2222231, 036 2222131",
+        "email": "chandimam@slt.com.lk"
+    },
+    {
+        "name": "Anuradhapura",
+        "latitude": 8.331966,
+        "longitude": 80.41028,
+        "address": "Main Road, Anuradhapura",
+        "phone": "025 2222231, 025 2222000",
+        "email": "neranga@slt.com.lk"
+    },
+    {
+        "name": "Gampola",
+        "latitude": 7.161846,
+        "longitude": 80.566310,
+        "address": "Nawalapitiya Road, Gampola.",
+        "phone": "081 2352231, 081 2352000",
+        "email": "muditha@slt.com.lk"
+    },
+    {
+        "name": "Hatton",
+        "latitude": 6.900344,
+        "longitude": 80.596609,
+        "address": "Near the Bus stand, Hatton.",
+        "phone": "051 2222231, 051 2222799",
+        "email": "mneahmed@slt.com.lk"
+    },
+    {
+        "name": "Kurunegala",
+        "latitude": 7.480540,
+        "longitude": 80.371556,
+        "address": "Kandy Road, Kurunegala.",
+        "phone": "037 2222231, 037 2222011",
+        "email": "aselaj@slt.com.lk"
+    },
+    {
+        "name": "Kegalle",
+        "latitude": 7.249509,
+        "longitude": 80.344047,
+        "address": "Kalugalla Mawatha, Kegalle.",
+        "phone": "035 2222231, 035 2222002",
+        "email": "dinushaw@slt.com.lk"
+    },
+    {
+        "name": "Kalutara",
+        "latitude": 6.585395,
+        "longitude": 79.960739,
+        "address": "Galle Road, Kalutara.",
+        "phone": "034 2222231, 034 2223200",
+        "email": "senarathna@slt.com.lk"
+    },
+    {
+        "name": "Kalmunai",
+        "latitude": 7.4167,
+        "longitude": 81.8167,
+        "address": "Yard Road, Kalmunei.",
+        "phone": "067 2222231, 067 2229233",
+        "email": "newton@slt.com.lk"
+    },
+    {
+        "name": "Ampara",
+        "latitude": 7.3018,
+        "longitude": 81.6747,
+        "address": "Ampara.",
+        "phone": "063 2222231, 063 2222249",
+        "email": "gssampath@slt.com.lk"
+    },
+    {
+        "name": "Hambantota",
+        "latitude": 6.142883,
+        "longitude": 81.121231,
+        "address": "Beach Road, Hambantota.",
+        "phone": "047 2220231, 047 2220241",
+        "email": "arunal@slt.com.lk"
+    },
+    {
+        "name": "Vavuniya",
+        "latitude": 8.7561,
+        "longitude": 80.4983,
+        "address": "Station Road, Vauniya.",
+        "phone": "024 2222231, 024 2222541",
+        "email": "thiva@slt.com.lk"
+    },
+    {
+        "name": "Kuliyapitiya",
+        "latitude": 7.45,
+        "longitude": 80.05,
+        "address": "Madampe Road, Kuliyapitiya.",
+        "phone": "0372283700, 0372284444",
+        "email": "udayanga@slt.com.lk"
+    },
+    {
+        "name": "Kilinochchi",
+        "latitude": 9.3833,
+        "longitude": 80.4000,
+        "address": "None",
+        "phone": "021 2285231, 021 2222248",
+        "email": "narenthanikan@slt.com.lk"
+    },
+    {
+        "name": "Embilipitiya",
+        "latitude": 6.343889,
+        "longitude": 80.848889,
+        "address": "New Town, Embilipitiya.",
+        "phone": "None",
+        "email": "gayanb@slt.com.lk"
+    },
+    {
+        "name": "Dambulla",
+        "latitude": 7.961216,
+        "longitude": 80.727311,
+        "address": "Kandy Road, Dambulla",
+        "phone": "066 2283666",
+        "email": "nalith@slt.com.lk"
+    },
+    {
+        "name": "Ambalangoda",
+        "latitude": 6.234739,
+        "longitude": 80.054417,
+        "address": "Galle Road, Ambalangoda.",
+        "phone": "091 2253831, 091 2253832",
+        "email": "sanjayak@slt.com.lk"
+    },
+    {
+        "name": "Nittambuwa",
+        "latitude": 7.0986,
+        "longitude": 80.0672,
+        "address": "No 1-D, Kandy Road, Nittambuwa.",
+        "phone": "033 2297100, 033 2297103",
+        "email": "rismi@slt.com.lk"
+    },
+    {
+        "name": "Horana",
+        "latitude": 6.722981,
+        "longitude": 80.064668,
+        "address": "Aluthgama Road, Horana.",
+        "phone": "034 2262231",
+        "email": "wmpwijesundara@slt.com.lk"
+    },
+    {
+        "name": "Beruwela",
+        "latitude": 6.473838,
+        "longitude": 79.991999,
+        "address": "Mangala Road, Beruwela.",
+        "phone": "0342278260, 0342278261",
+        "email": "rexyp@slt.com.lk"
+    },
+    {
+        "name": "Nuwara Eliya",
+        "latitude": 6.949716,
+        "longitude": 80.789107,
+        "address": "Badulla Road, Nuwaraeliya.",
+        "phone": "052 2222231, 052 2223444",
+        "email": "heshani@slt.com.lk"
+    },
+    {
+        "name": "Nugegoda",
+        "latitude": 6.869505,
+        "longitude": 79.888916,
+        "address": "High Level Road, Nugegoda.",
+        "phone": "011 2853966, 011 2856792",
+        "email": "dilhara@slt.com.lk"
+    },
+    {
+        "name": "Negombo",
+        "latitude": 7.206428,
+        "longitude": 79.841853,
+        "address": "St. Josheps Street, Negombo",
+        "phone": "031 2222231, 031 2224400",
+        "email": "harshanag@slt.com.lk"
+    }
+]

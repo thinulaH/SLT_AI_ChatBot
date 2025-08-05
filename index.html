@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLT Chatbot with Location</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+        }
+        
+        /* Markdown formatting styles */
+        .bot-message h1, .bot-message h2, .bot-message h3 {
+            margin: 10px 0 5px 0;
+            color: #2c3e50;
+        }
+        .bot-message h1 { font-size: 1.4em; }
+        .bot-message h2 { font-size: 1.2em; }
+        .bot-message h3 { font-size: 1.1em; }
+        
+        .bot-message strong, .bot-message b {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .bot-message em, .bot-message i {
+            font-style: italic;
+            color: #555;
+        }
+        
+        .bot-message ul, .bot-message ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .bot-message li {
+            margin: 3px 0;
+        }
+        
+        .bot-message a {
+            color: #007bff;
+            text-decoration: none;
+            border-bottom: 1px dotted #007bff;
+        }
+        
+        .bot-message a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        
+        .bot-message code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .bot-message pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .bot-message blockquote {
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+            padding: 5px 15px;
+            background-color: #f8f9fa;
+            font-style: italic;
+        }
+        
+        .bot-message hr {
+            border: none;
+            border-top: 2px solid #dee2e6;
+            margin: 15px 0;
+        }
+        
+        /* Branch info specific styling */
+        .branch-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        
+        .branch-name {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .branch-detail {
+            margin: 3px 0;
+            font-size: 0.95em;
+        }
+        
+        .distance {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .location-button {
+            background-color: #28a745;
+        }
+        .location-button:hover {
+            background-color: #218838;
+        }
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-style: italic;
+            color: #666;
+        }
+        .quick-actions {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .quick-btn {
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quick-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>🌐 SLT Assistant with Location</h1>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendMessage('Hi')">👋 Say Hi</button>
+            <button class="quick-btn" onclick="sendMessage('What are SLT broadband packages?')">📶 Broadband</button>
+            <button class="quick-btn" onclick="sendMessage('Tell me about PEO TV')">📺 PEO TV</button>
+            <button class="quick-btn" onclick="requestNearestBranches()">📍 Find Nearest Branches</button>
+        </div>
+        
+        <div class="messages" id="messages"></div>
+        
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Ask about SLT services..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendBtn">Send</button>
+        </div>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4321';
+        
+        // Markdown parsing function
+        function parseMarkdown(text) {
+            // Handle branch-specific formatting first
+            text = formatBranchInfo(text);
+            
+            // Convert markdown to HTML
+            return text
+                // Headers
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                
+                // Italic text
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                
+                // Links with markdown syntax [text](url)
+                .replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>')
+                
+                // Automatic links (http/https)
+                .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
+                
+                // Lists (handle • and - bullets)
+                .replace(/^[•\-] (.*)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                
+                // Numbered lists
+                .replace(/^\d+\.\s(.*)$/gm, '<li>$1</li>')
+                
+                // Line breaks
+                .replace(/\n\n/g, '<br><br>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        // Special formatting for branch information
+        function formatBranchInfo(text) {
+            // Check if this is branch information
+            if (text.includes('📍') && text.includes('km away')) {
+                // Split into sections
+                const sections = text.split(/\n\s*\n/);
+                let formatted = '';
+                
+                sections.forEach(section => {
+                    if (section.includes('📍') && section.includes('km away')) {
+                        // This is a branch entry
+                        const lines = section.split('\n');
+                        formatted += '<div class="branch-info">';
+                        
+                        lines.forEach(line => {
+                            line = line.trim();
+                            if (line.includes('📍') && line.includes('km away')) {
+                                // Branch name and distance
+                                const match = line.match(/📍 \*\*(.*?)\*\* – ([\d.]+) km away/);
+                                if (match) {
+                                    formatted += `<div class="branch-name">📍 ${match[1]}</div>`;
+                                    formatted += `<div class="distance">${match[2]} km away</div>`;
+                                }
+                            } else if (line.includes('🏠')) {
+                                formatted += `<div class="branch-detail">${line}</div>`;
+                            } else if (line.includes('📞')) {
+                                formatted += `<div class="branch-detail">${line}</div>`;
+                            } else if (line.includes('📧')) {
+                                formatted += `<div class="branch-detail">${line}</div>`;
+                            } else if (line.includes('🕒')) {
+                                formatted += `<div class="branch-detail">${line}</div>`;
+                            }
+                        });
+                        
+                        formatted += '</div>';
+                    } else {
+                        // Regular section
+                        formatted += section + '\n\n';
+                    }
+                });
+                
+                return formatted;
+            }
+            
+            return text;
+        }
+        
+        function addMessage(content, isUser = false) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            if (isUser) {
+                messageDiv.textContent = content;
+            } else {
+                // Parse markdown for bot messages
+                messageDiv.innerHTML = parseMarkdown(content);
+            }
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function setStatus(text) {
+            document.getElementById('status').textContent = text;
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        async function sendMessage(message = null) {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            const userMessage = message || input.value.trim();
+            if (!userMessage) return;
+            
+            if (!message) {
+                input.value = '';
+            }
+            
+            addMessage(userMessage, true);
+            sendBtn.disabled = true;
+            setStatus('🤖 Thinking...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: userMessage,
+                        user_id: 'web_user'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    addMessage(`❌ Error: ${data.error}`);
+                } else {
+                    addMessage(data.reply);
+                    
+                    // Check if location sharing is requested
+                    if (data.request_location) {
+                        setTimeout(() => {
+                            addLocationRequestButtons();
+                        }, 500);
+                    }
+                    
+                    // Show which LLM was used
+                    if (data.llm_used) {
+                        setStatus(`✅ Response from ${data.llm_used}`);
+                    }
+                }
+            } catch (error) {
+                addMessage(`❌ Network error: ${error.message}`);
+                setStatus('❌ Connection failed');
+            } finally {
+                sendBtn.disabled = false;
+                setStatus('');
+            }
+        }
+        
+        function addLocationRequestButtons() {
+            const messages = document.getElementById('messages');
+            const buttonContainer = document.createElement('div');
+            buttonContainer.innerHTML = `
+                <div style="text-align: center; margin: 10px 0;">
+                    <button class="location-button" onclick="shareLocation()" style="margin: 5px;">
+                        📍 Share My Location
+                    </button>
+                    <br>
+                    <button class="quick-btn" onclick="sendMessage('Colombo')" style="margin: 5px;">Colombo</button>
+                    <button class="quick-btn" onclick="sendMessage('Kandy')" style="margin: 5px;">Kandy</button>
+                    <button class="quick-btn" onclick="sendMessage('Galle')" style="margin: 5px;">Galle</button>
+                </div>
+            `;
+            messages.appendChild(buttonContainer);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        async function shareLocation() {
+            if (!navigator.geolocation) {
+                addMessage('❌ Geolocation is not supported by this browser.');
+                return;
+            }
+            
+            setStatus('📍 Getting your location...');
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    
+                    setStatus('🔍 Finding nearest branches...');
+                    
+                    try {
+                        const response = await fetch(`${API_BASE}/location`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                latitude: latitude,
+                                longitude: longitude
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) {
+                            addMessage(`❌ ${data.error}`);
+                        } else {
+                            addMessage(`📍 <em>Using your current location</em>`);
+                            addMessage(data.reply);
+                        }
+                    } catch (error) {
+                        addMessage(`❌ Error processing location: ${error.message}`);
+                    } finally {
+                        setStatus('');
+                    }
+                },
+                (error) => {
+                    let errorMessage = '❌ ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Location access denied. Please enable location sharing or enter your city manually.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Location information unavailable. Please enter your city manually.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Location request timed out. Please try again or enter your city manually.';
+                            break;
+                        default:
+                            errorMessage += 'An unknown error occurred while getting location.';
+                            break;
+                    }
+                    addMessage(errorMessage);
+                    setStatus('');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000 // 5 minutes
+                }
+            );
+        }
+        
+        function requestNearestBranches() {
+            sendMessage('Find branches near me');
+        }
+        
+        // Initialize
+        addMessage('👋 Hello! I\'m your SLT assistant. How can I help you today?');
+        setStatus('✅ Ready to help!');
+    </script>
+</body>
+</html>
