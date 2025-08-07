@@ -1,1 +1,32 @@
+# Ignore chroma DB folder
 chroma_db/
+
+# macOS system files
+.DS_Store
+
+# Python cache and virtual env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Node.js
+node_modules/
+
+# VS Code settings
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Ignore local settings or secrets
+*.sqlite3
+*.env
+*.local
