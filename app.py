@@ -212,10 +212,10 @@ class SLTChatbot:
                     for branch, dist in nearest_branches:
                         response_parts.append(self.format_branch(branch, dist))
                         response_parts.append("")
-                    response_parts.append("🔗 **More Info:** https://www.slt.lk/en/contact-us/branch-locator")
+                    response_parts.append("🔗 **More Info:** https://www.slt.lk/en/contact-us/branch-locator/our-locations/our-network")
                 else:
                     response_parts.append("❌ No branch data available nearby.")
-                    response_parts.append("🔗 **Find branches:** https://www.slt.lk/en/contact-us/branch-locator")
+                    response_parts.append("🔗 **Find branches:** https://www.slt.lk/en/contact-us/branch-locator/our-locations/our-network")
                 
                 return "\n".join(response_parts)
             
@@ -240,10 +240,10 @@ class SLTChatbot:
                 for branch, dist in nearest_branches:
                     response_parts.append(self.format_branch(branch, dist))
                     response_parts.append("")
-                response_parts.append("🔗 **More Info:** https://www.slt.lk/en/contact-us/branch-locator")
+                response_parts.append("🔗 **More Info:** https://www.slt.lk/en/contact-us/branch-locator/our-locations/our-network")
             else:
                 response_parts.append("❌ No branch data available nearby.")
-                response_parts.append("🔗 **Find branches:** https://www.slt.lk/en/contact-us/branch-locator")
+                response_parts.append("🔗 **Find branches:** https://www.slt.lk/en/contact-us/branch-locator/our-locations/our-network")
             
             return "\n".join(response_parts)
             
