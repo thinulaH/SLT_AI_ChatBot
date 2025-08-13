@@ -26,7 +26,7 @@ CHROMA_PERSIST_DIR = "./chroma_db"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
-MAX_CRAWL_DURATION = 60 * 20  # 10 minutes
+MAX_CRAWL_DURATION = 60 * 5  # 10 minutes
 MAX_CRAWL_DEPTH = 5
 
 VISITED_URLS_FILE = "visited_urls.txt"
@@ -53,7 +53,10 @@ async def crawl_website(base_url: str, start_urls: list[str] = None) -> list[Doc
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
-        context = await browser.new_context()
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800}
+        )
         page = await context.new_page()
 
         while urls_to_visit:
@@ -69,7 +72,8 @@ async def crawl_website(base_url: str, start_urls: list[str] = None) -> list[Doc
             try:
                 visited_urls.add(url)
                 print(f"Navigating to (depth {depth}): {url}")
-                await page.goto(url, wait_until="domcontentloaded")
+                await page.goto(url, wait_until="networkidle")
+                await page.wait_for_timeout(3000)  # wait 3 seconds for JS to render
                 
                 html_content = await page.content()
                 doc = Document(
@@ -154,7 +158,7 @@ def create_vector_store(chunks: list[Document]):
 
 # --- Main Execution ---
 async def main():
-    raw_docs = await crawl_website(WEBSITE_URL, start_urls=MUST_SCRAPE_URLS)
+    raw_docs = await crawl_website(WEBSITE_URL, start_urls=[WEBSITE_URL] + MUST_SCRAPE_URLS)
     
     if not raw_docs:
         print("No documents were scraped. Exiting.")
