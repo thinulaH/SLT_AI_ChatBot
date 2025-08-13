@@ -362,7 +362,7 @@ class SLTChatbot:
         self.setup_llm()
 
 # Configuration - Set your preferences here
-USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "true").lower() == "true"
+USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDgniAjT8lW0IZQNupdjwA7aas14jTpM5I")
 
 # Initialize chatbot
@@ -548,7 +548,7 @@ def internal_error(error):
 
 # Start app
 if __name__ == "__main__":
-    logger.info("🚀 Starting SLT Chatbot API server...")
+    logger.info("🚀 Starting SLT Chatbot API server (local mode)...")
     logger.info(f"📊 Vector store: {chatbot.vector_store._collection.count() if chatbot.vector_store else 0} documents loaded")
     logger.info(f"🌍 Branch data: {len(chatbot.branches)} locations loaded")
     logger.info(f"🤖 LLM: {'Local LLM (Ollama)' if chatbot.use_local_llm else 'Google Gemini'}")
