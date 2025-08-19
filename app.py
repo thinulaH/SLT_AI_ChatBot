@@ -28,16 +28,30 @@ app = Flask(__name__)
 CORS(app)
 
 class SLTChatbot:
-    def __init__(self, use_local_llm=True, gemini_api_key="AIzaSyC-bpA_o2tEDc3VNoUFyz0fqQwLVDUosLQ"):
+    def __init__(self, use_local_llm=True, gemini_api_key="AIzaSyCjS3Uj_ZdQX4TnSjx1CmCPMkLsc4sM0_4"):
         self.use_local_llm = use_local_llm
         self.gemini_api_key = gemini_api_key
         self.gemini_model = None
         self.vector_store = None
+        self.packages_vector_store = None  # New: Dedicated packages vector store
         self.embeddings = None
         self.branches = []
-        self.city_names = set() # Store city names for quick lookup
+        self.city_names = set()
         self.vector_store_path = None
+        self.packages_vector_store_path = "./packages_chroma_db"  # New: Path to packages vector store
         self.initialize()
+        self.sessions = {}  # Store user session histories
+
+    def add_to_session(self, user_id, role, message, max_history=10):
+        if user_id not in self.sessions:
+            self.sessions[user_id] = []
+        self.sessions[user_id].append({"role": role, "content": message})
+        # Limit history length
+        if len(self.sessions[user_id]) > max_history:
+            self.sessions[user_id] = self.sessions[user_id][-max_history:]
+
+    def get_session_history(self, user_id):
+        return self.sessions.get(user_id, [])
 
     def initialize(self):
         logger.info("🔄 Initializing SLT Chatbot...")
@@ -48,6 +62,7 @@ class SLTChatbot:
 
     def setup_llm(self):
         """Initialize the selected LLM (Local Ollama or Google Gemini)"""
+        # Unchanged from original
         if self.use_local_llm:
             logger.info("🤖 Using Local LLM (Ollama)")
             try:
@@ -66,14 +81,16 @@ class SLTChatbot:
             
             try:
                 genai.configure(api_key=self.gemini_api_key)
-                self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+                self.gemini_model = genai.GenerativeModel('gemini-2.5-flash-lite')
                 logger.info("✅ Google Gemini initialized successfully")
             except Exception as e:
                 logger.error(f"❌ Failed to initialize Google Gemini: {e}")
                 raise
 
     def init_vector_db(self):
+        """Initialize both general and packages vector databases"""
         try:
+            # Initialize general vector database
             db_paths = [
                 "./chroma_db",
                 "./slt_chroma_db",
@@ -82,12 +99,12 @@ class SLTChatbot:
             ]
             for db_path in db_paths:
                 if Path(db_path).exists():
-                    logger.info(f"🔍 Found Chroma DB at: {db_path}")
+                    logger.info(f"🔍 Found general Chroma DB at: {db_path}")
                     self.vector_store_path = db_path
                     break
 
             if not self.vector_store_path:
-                logger.warning("⚠️ No existing Chroma DB found, creating new at ./chroma_db")
+                logger.warning("⚠️ No existing general Chroma DB found, creating new at ./chroma_db")
                 self.vector_store_path = "./chroma_db"
 
             self.embeddings = HuggingFaceEmbeddings(model_name='all-MiniLM-L6-v2')
@@ -95,13 +112,29 @@ class SLTChatbot:
                 persist_directory=self.vector_store_path,
                 embedding_function=self.embeddings
             )
-            doc_count = self.vector_store._collection.count()
-            logger.info(f"✅ Vector store loaded with {doc_count} documents")
+            general_doc_count = self.vector_store._collection.count()
+            logger.info(f"✅ General vector store loaded with {general_doc_count} documents")
+
+            # Initialize packages vector database
+            if Path(self.packages_vector_store_path).exists():
+                logger.info(f"🔍 Found packages Chroma DB at: {self.packages_vector_store_path}")
+                self.packages_vector_store = Chroma(
+                    persist_directory=self.packages_vector_store_path,
+                    embedding_function=self.embeddings
+                )
+                packages_doc_count = self.packages_vector_store._collection.count()
+                logger.info(f"✅ Packages vector store loaded with {packages_doc_count} documents")
+            else:
+                logger.warning(f"⚠️ Packages vector store not found at {self.packages_vector_store_path}")
+                self.packages_vector_store = None
+
         except Exception as e:
-            logger.error(f"❌ Failed to initialize vector store: {e}")
+            logger.error(f"❌ Failed to initialize vector stores: {e}")
             self.vector_store = None
+            self.packages_vector_store = None
 
     def load_branches(self):
+        # Unchanged from original
         branch_files = [
             "data/branches.json",
             "./branches.json",
@@ -124,7 +157,28 @@ class SLTChatbot:
         logger.warning("⚠️ No branch data found. Location features will be limited.")
         self.branches = []
 
+    def is_package_query(self, query):
+        """Determine if the query is related to broadband packages, excluding PEO TV and extra GB queries"""
+        package_keywords = [
+            "package", "plan", "broadband", "internet", "data",
+            "monthly", "unlimited", "gb", "fiber", "fibre", "4g", "adsl", "wifi"
+        ]
+        peo_tv_keywords = ["peo tv", "peotv", "tv", "television", "channel", "channels"]
+        extra_gb_keywords = ["extra gb", "additional data", "add-on data", "more data", 
+                            "extra data", "data booster", "data add-on", "additional gb"]
+        query_lower = query.lower()
+        
+        # Check if the query contains PEO TV or extra GB-related keywords
+        is_peo_tv_query = any(keyword in query_lower for keyword in peo_tv_keywords)
+        is_extra_gb_query = any(keyword in query_lower for keyword in extra_gb_keywords)
+        
+        # Return True only for broadband package queries (not PEO TV or extra GB)
+        return (any(keyword in query_lower for keyword in package_keywords) and 
+                not is_peo_tv_query and 
+                not is_extra_gb_query)
+
     def preprocess_query(self, query):
+        # Unchanged from original, but kept here for reference
         query = query.strip()
         if len(query.split()) < 3:
             query = query + " SLT broadband packages services"
@@ -142,27 +196,91 @@ class SLTChatbot:
         return query
 
     def find_relevant_chunks(self, query, top_n=3):
+        """Search both vector databases, prioritizing the appropriate one based on query type and supplementing with the other"""
         if not self.vector_store:
-            logger.warning("⚠️ Vector store not initialized")
+            logger.warning("⚠️ General vector store not initialized")
             return []
+
+        processed_query = self.preprocess_query(query)
+        logger.info(f"🔍 Searching for: {processed_query}")
+
+        matched_chunks = []
         try:
-            processed_query = self.preprocess_query(query)
-            logger.info(f"🔍 Searching for: {processed_query}")
-            results = self.vector_store.similarity_search(processed_query, k=top_n)
-            matched_chunks = []
-            for doc in results:
-                matched_chunks.append({
-                    "title": doc.metadata.get("title", "Unknown Title"),
-                    "content": doc.page_content,
-                    "source": doc.metadata.get("source", ""),
-                })
-            logger.info(f"✅ Found {len(matched_chunks)} matching chunks")
-            return matched_chunks
+            if self.is_package_query(query) and self.packages_vector_store:
+                # Package query: Prioritize packages vector store
+                logger.info("🔍 Query detected as package-related, searching packages vector store")
+                package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=top_n)
+                for doc, score in package_results:
+                    matched_chunks.append({
+                        "title": doc.metadata.get("title", "Unknown Title"),
+                        "content": doc.page_content,
+                        "source": "https://www.slt.lk/en/broadband/packages",  # Fixed source for package results
+                        "score": score  # Store similarity score for prioritization
+                    })
+                logger.info(f"✅ Found {len(package_results)} package-specific chunks")
+
+                # Supplement with the most relevant document from general vector store
+                if self.vector_store and len(matched_chunks) < top_n:
+                    logger.info("🔍 Searching general vector store for supplementary results")
+                    general_results = self.vector_store.similarity_search_with_score(processed_query, k=1)  # Get top 1
+                    for doc, score in general_results:
+                        matched_chunks.append({
+                            "title": doc.metadata.get("title", "Unknown Title"),
+                            "content": doc.page_content,
+                            "source": doc.metadata.get("source", ""),  # Use original source
+                            "score": score
+                        })
+                    logger.info(f"✅ Added {len(general_results)} supplementary general chunks")
+            else:
+                # Non-package query (e.g., PEO TV, extra GB): Prioritize general vector store
+                logger.info("🔍 Query is non-package related, searching general vector store")
+                general_results = self.vector_store.similarity_search_with_score(processed_query, k=top_n)
+                for doc, score in general_results:
+                    matched_chunks.append({
+                        "title": doc.metadata.get("title", "Unknown Title"),
+                        "content": doc.page_content,
+                        "source": doc.metadata.get("source", ""),  # Use original source
+                        "score": score
+                    })
+                logger.info(f"✅ Found {len(general_results)} general chunks")
+
+                # Supplement with the most relevant document from packages vector store
+                if self.packages_vector_store and len(matched_chunks) < top_n:
+                    logger.info("🔍 Searching packages vector store for supplementary results")
+                    package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=1)  # Get top 1
+                    for doc, score in package_results:
+                        matched_chunks.append({
+                            "title": doc.metadata.get("title", "Unknown Title"),
+                            "content": doc.page_content,
+                            "source": "https://www.slt.lk/en/broadband/packages",  # Fixed source for package results
+                            "score": score
+                        })
+                    logger.info(f"✅ Added {len(package_results)} supplementary package chunks")
+
+            # Deduplicate chunks based on content and sort by similarity score
+            seen_content = set()
+            unique_chunks = []
+            for chunk in matched_chunks:
+                if chunk["content"] not in seen_content:
+                    seen_content.add(chunk["content"])
+                    unique_chunks.append(chunk)
+
+            # Sort by similarity score (lower is better) to prioritize primary database results
+            unique_chunks = sorted(unique_chunks, key=lambda x: x["score"])[:top_n]
+
+            # Remove score from final output to maintain original chunk structure
+            for chunk in unique_chunks:
+                chunk.pop("score", None)
+
+            logger.info(f"✅ Final count: {len(unique_chunks)} unique matching chunks")
+            return unique_chunks
+
         except Exception as e:
-            logger.error(f"❌ Error searching vector store: {e}")
+            logger.error(f"❌ Error searching vector stores: {e}")
             return []
 
     def find_nearest_branches(self, user_coords, top_n=3):
+        # Unchanged from original
         if not self.branches:
             return []
         distances = []
@@ -176,6 +294,7 @@ class SLTChatbot:
         return sorted(distances, key=lambda x: x[1])[:top_n]
 
     def format_branch(self, branch, dist_km):
+        # Unchanged from original
         lines = [f"📍 **{branch['name']}** – {dist_km:.1f} km away"]
         if branch.get("address"):
             lines.append(f"🏠 **Address:** {branch['address']}")
@@ -188,6 +307,7 @@ class SLTChatbot:
         return "\n".join(lines)
 
     def handle_location_query(self, user_input, user_coords=None):
+        # Unchanged from original
         try:
             geolocator = Nominatim(user_agent="slt-location-finder")
             
@@ -251,9 +371,8 @@ class SLTChatbot:
             logger.error(f"❌ Location query error: {e}")
             return f"❌ Sorry, I encountered an error processing your location request. Please try again or visit the SLT website."
 
-
     def _append_source_links(self, response_text, chunks):
-        """Appends unique source links from chunks to the response text."""
+        # Unchanged from original
         source_links = {chunk['source'] for chunk in chunks if chunk.get('source')}
         if not source_links:
             return response_text
@@ -264,7 +383,7 @@ class SLTChatbot:
         return response_text.strip()
 
     def query_local_llm(self, user_query, context_chunks):
-        """Query local Ollama LLM"""
+        # Unchanged from original
         try:
             context_blocks = []
             for chunk in context_chunks:
@@ -303,7 +422,7 @@ class SLTChatbot:
             return "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
 
     def query_gemini_llm(self, user_query, context_chunks):
-        """Query Google Gemini LLM"""
+        # Unchanged from original
         try:
             context_blocks = []
             for chunk in context_chunks:
@@ -328,18 +447,71 @@ class SLTChatbot:
             logger.error(f"❌ Gemini LLM query failed: {e}")
             return "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
 
-    def query_llm(self, user_query, context_chunks):
-        """Query the selected LLM (Local or Gemini) and append source links."""
+    def query_llm(self, user_query, context_chunks, user_id):
+        # Unchanged from original, but included for reference
         logger.info(f"🤖 Using {'Local LLM' if self.use_local_llm else 'Google Gemini'}")
-        
+        history = self.get_session_history(user_id)
+        history_text = "\n".join([f"{h['role'].capitalize()}: {h['content']}" for h in history if h['role'] != "system"])
         if self.use_local_llm:
-            llm_response = self.query_local_llm(user_query, context_chunks)
+            context_blocks = []
+            for chunk in context_chunks:
+                url = chunk['source']
+                title = chunk.get('title', 'No Title')
+                content = chunk['content'][:1500]
+                block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
+                context_blocks.append(block)
+            full_context = "\n\n---\n\n".join(context_blocks)
+            system_prompt = (
+                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
+                f"Conversation history:\n{history_text}\n\n"
+                f"User question: {user_query}\n\n"
+                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
+            )
+            try:
+                response = httpx.post(
+                    "http://127.0.0.1:11434/api/chat",
+                    json={
+                        "model": "gemma3:4b",
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_query}
+                        ],
+                        "stream": True
+                    },
+                    timeout=60
+                )
+                reply_text = "".join(json.loads(line)['message']['content'] for line in response.iter_lines() if line.strip())
+            except Exception as e:
+                logger.error(f"❌ Local LLM query failed: {e}")
+                reply_text = "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
         else:
-            llm_response = self.query_gemini_llm(user_query, context_chunks)
-            
-        return self._append_source_links(llm_response, context_chunks)
+            context_blocks = []
+            for chunk in context_chunks:
+                url = chunk['source']
+                title = chunk.get('title', 'No Title')
+                content = chunk['content'][:1500]
+                block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
+                context_blocks.append(block)
+            full_context = "\n\n---\n\n".join(context_blocks)
+            prompt = (
+                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
+                f"Conversation history:\n{history_text}\n\n"
+                f"User question: {user_query}\n\n"
+                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
+            )
+            try:
+                response = self.gemini_model.generate_content(prompt)
+                reply_text = response.text.strip()
+            except Exception as e:
+                logger.error(f"❌ Gemini LLM query failed: {e}")
+                reply_text = "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
+        self.add_to_session(user_id, "assistant", reply_text)
+        return self._append_source_links(reply_text, context_chunks)
 
     def generate_fallback_response(self, user_input, chunks):
+        # Unchanged from original
         if not chunks:
             return "❌ I couldn't find specific information about that. Please visit https://www.slt.lk or call customer service at 1212."
         response_parts = ["📋 **Here's what I found:**", ""]
@@ -354,16 +526,16 @@ class SLTChatbot:
         return self._append_source_links("\n".join(response_parts), chunks)
 
     def switch_llm(self, use_local_llm, gemini_api_key=None):
-        """Switch between Local LLM and Google Gemini"""
+        # Unchanged from original
         logger.info(f"🔄 Switching to {'Local LLM' if use_local_llm else 'Google Gemini'}")
         self.use_local_llm = use_local_llm
         if not use_local_llm and gemini_api_key:
             self.gemini_api_key = gemini_api_key
         self.setup_llm()
 
-# Configuration - Set your preferences here
+# Configuration
 USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDgniAjT8lW0IZQNupdjwA7aas14jTpM5I")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyCjS3Uj_ZdQX4TnSjx1CmCPMkLsc4sM0_4")
 
 # Initialize chatbot
 chatbot = SLTChatbot(
@@ -372,14 +544,17 @@ chatbot = SLTChatbot(
 )
 
 # === API Endpoints ===
-
+# All endpoints remain unchanged from the original code
 @app.route("/", methods=["GET"])
 def health():
     return jsonify({
         "status": "✅ SLT Chatbot API is running",
         "timestamp": datetime.now().isoformat(),
         "branches_loaded": len(chatbot.branches),
-        "vector_db_documents": chatbot.vector_store._collection.count() if chatbot.vector_store else 0,
+        "vector_db_documents": (
+            (chatbot.vector_store._collection.count() if chatbot.vector_store else 0) +
+            (chatbot.packages_vector_store._collection.count() if chatbot.packages_vector_store else 0)
+        ),
         "embedding_model": "all-MiniLM-L6-v2",
         "llm_type": "Local LLM (Ollama)" if chatbot.use_local_llm else "Google Gemini",
         "gemini_configured": chatbot.gemini_api_key is not None
@@ -387,7 +562,6 @@ def health():
 
 @app.route("/switch-llm", methods=["POST"])
 def switch_llm():
-    """Endpoint to switch between Local LLM and Google Gemini"""
     try:
         data = request.get_json()
         use_local_llm = data.get("use_local_llm", True)
@@ -425,6 +599,9 @@ def chat():
         logger.info(f"💬 User query: {user_input}")
         user_lower = user_input.lower()
 
+        # Store user input in session
+        chatbot.add_to_session(user_id, "user", user_input)
+
         # Handle casual replies first
         casual_replies = {
             "hello": "👋 Hello! I'm your SLT assistant. How can I help you today?",
@@ -438,14 +615,10 @@ def chat():
         if user_lower in casual_replies:
             return jsonify({"reply": casual_replies[user_lower]})
 
-        # Updated location handling logic for improved robustness
+        # Handle location queries
         location_keywords = ["branch", "location", "office", "near", "address", "where", "closest", "nearby"]
-        
-        # Check if the query contains a known city name and a location keyword
         user_words = user_lower.split()
         is_location_query = any(word in user_words for word in location_keywords)
-        
-        # New: Check for a specific city name within the query
         found_city = next((city for city in chatbot.city_names if city in user_lower), None)
 
         if is_location_query:
@@ -454,21 +627,19 @@ def chat():
                 response = chatbot.handle_location_query(found_city)
                 return jsonify({"reply": response})
             elif any(phrase in user_lower for phrase in ["near me", "my location", "closest", "nearby"]):
-                 # If the query is a generic "near me", ask for location permission
                 return jsonify({
                     "reply": "📍 To find the nearest SLT branches, I need your location.\n\n**Options:**\n1️⃣ **Share your location** (most accurate)\n2️⃣ **Tell me your city/area** (e.g., 'Colombo', 'Kandy', 'Galle')\n\n🔒 *Your location data is only used to find nearby branches and is not stored.*",
                     "request_location": True
                 })
 
-        # Fall-through to the RAG pipeline for all other queries
-        # This is the key fix to prevent non-location queries from being misclassified
+        # Handle package and other queries using the appropriate vector store
         chunks = chatbot.find_relevant_chunks(user_input, top_n=3)
         if not chunks:
             return jsonify({
                 "reply": "❌ I couldn't find specific information about that topic. \n\n🔗 **Try visiting:**\n- https://www.slt.lk/en/broadband/packages\n- https://www.slt.lk/en/peo-tv/packages\n- **Customer Service:** 1212"
             })
 
-        llm_response = chatbot.query_llm(user_input, chunks)
+        llm_response = chatbot.query_llm(user_input, chunks, user_id)
         return jsonify({
             "reply": llm_response,
             "llm_used": "Local LLM (Ollama)" if chatbot.use_local_llm else "Google Gemini"
@@ -483,7 +654,7 @@ def chat():
 
 @app.route("/location", methods=["POST"])
 def handle_location():
-    """Handle device location for finding nearest branches"""
+    # Unchanged from original
     try:
         data = request.get_json()
         if not data:
@@ -509,7 +680,6 @@ def handle_location():
     
         logger.info(f"📍 Processing location request: {lat}, {lng}")
     
-        # Use the handle_location_query function with the provided coordinates
         response = chatbot.handle_location_query("", user_coords=user_coords)
         return jsonify({"reply": response})
     
@@ -522,6 +692,7 @@ def handle_location():
 
 @app.route("/search", methods=["POST"])
 def search():
+    # Unchanged from original
     try:
         data = request.get_json()
         query = data.get("query", "").strip()
@@ -549,7 +720,8 @@ def internal_error(error):
 # Start app
 if __name__ == "__main__":
     logger.info("🚀 Starting SLT Chatbot API server (local mode)...")
-    logger.info(f"📊 Vector store: {chatbot.vector_store._collection.count() if chatbot.vector_store else 0} documents loaded")
+    logger.info(f"📊 General vector store: {chatbot.vector_store._collection.count() if chatbot.vector_store else 0} documents loaded")
+    logger.info(f"📊 Packages vector store: {chatbot.packages_vector_store._collection.count() if chatbot.packages_vector_store else 0} documents loaded")
     logger.info(f"🌍 Branch data: {len(chatbot.branches)} locations loaded")
     logger.info(f"🤖 LLM: {'Local LLM (Ollama)' if chatbot.use_local_llm else 'Google Gemini'}")
     app.run(

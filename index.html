@@ -3,216 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLT Chatbot with Location</title>
+    <title>SLT-Mobitel Assistant</title>
     <style>
+        /* General resets and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Light, clean background */
+            background: linear-gradient(135deg, #e0f9f0 0%, #d0f0e8 100%);
+            min-height: 100vh;
             padding: 20px;
-            background-color: #f5f5f5;
         }
+
         .chat-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
         }
-        .messages {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            line-height: 1.5;
-        }
-        .user-message {
-            background-color: #007bff;
+
+        /* Header section with blue gradient */
+        .chat-header {
+            background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
             color: white;
-            text-align: right;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        .chat-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Quick action buttons with green gradient */
+        .quick-actions {
+            padding: 20px;
+            background: #f8f9ff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .quick-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Chat message area */
+        .messages {
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
         .bot-message {
-            background-color: #e9ecef;
-            color: #333;
+            justify-content: flex-start;
         }
-        
-        /* Markdown formatting styles */
-        .bot-message h1, .bot-message h2, .bot-message h3 {
-            margin: 10px 0 5px 0;
-            color: #2c3e50;
+
+        .message-content {
+            max-width: 75%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            line-height: 1.6;
+            font-size: 0.95rem;
         }
-        .bot-message h1 { font-size: 1.4em; }
-        .bot-message h2 { font-size: 1.2em; }
-        .bot-message h3 { font-size: 1.1em; }
-        
-        .bot-message strong, .bot-message b {
-            font-weight: bold;
-            color: #2c3e50;
+
+        /* User message bubble with blue gradient */
+        .user-message .message-content {
+            background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
+            color: white;
+            border-bottom-right-radius: 8px;
         }
-        
-        .bot-message em, .bot-message i {
-            font-style: italic;
-            color: #555;
+
+        /* Bot message bubble (white/light gray) */
+        .bot-message .message-content {
+            background: #f1f5f9;
+            color: #334155;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
-        .bot-message ul, .bot-message ol {
-            margin: 8px 0;
+
+        /* Enhanced markdown styling */
+        .message-content h1, .message-content h2, .message-content h3 {
+            margin: 15px 0 10px 0;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .message-content h1 { font-size: 1.4em; }
+        .message-content h2 { font-size: 1.25em; }
+        .message-content h3 { font-size: 1.1em; }
+
+        .message-content strong, .message-content b {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .message-content ul, .message-content ol {
+            margin: 12px 0;
             padding-left: 20px;
         }
-        
-        .bot-message li {
-            margin: 3px 0;
+
+        .message-content li {
+            margin: 6px 0;
         }
-        
-        .bot-message a {
-            color: #007bff;
+
+        .message-content a {
+            color: #3b82f6;
             text-decoration: none;
-            border-bottom: 1px dotted #007bff;
+            font-weight: 500;
         }
-        
-        .bot-message a:hover {
-            color: #0056b3;
+
+        .message-content a:hover {
             text-decoration: underline;
         }
-        
-        .bot-message code {
-            background-color: #f8f9fa;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
+
+        /* Action buttons styling with green gradient */
+        .action-buttons {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        
-        .bot-message pre {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
-        
-        .bot-message blockquote {
-            border-left: 4px solid #007bff;
-            margin: 10px 0;
-            padding: 5px 15px;
-            background-color: #f8f9fa;
-            font-style: italic;
-        }
-        
-        .bot-message hr {
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
             border: none;
-            border-top: 2px solid #dee2e6;
-            margin: 15px 0;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
         }
-        
-        /* Branch info specific styling */
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-btn:before {
+            content: "🔗";
+            margin-right: 6px;
+        }
+
+        .action-btn[href^="tel:"]:before {
+            content: "📞";
+        }
+
+        .action-btn.register:before {
+            content: "📝";
+        }
+
+        .action-btn.login:before {
+            content: "🔑";
+        }
+
+        .action-btn.contact:before {
+            content: "💬";
+        }
+
+        /* Branch info styling */
         .branch-info {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
         }
-        
+
         .branch-name {
-            font-weight: bold;
-            color: #28a745;
-            font-size: 1.1em;
-            margin-bottom: 5px;
+            font-weight: 600;
+            color: #0c4a6e;
+            font-size: 1.05em;
+            margin-bottom: 8px;
         }
-        
+
         .branch-detail {
-            margin: 3px 0;
-            font-size: 0.95em;
+            margin: 4px 0;
+            font-size: 0.9em;
+            color: #475569;
         }
-        
+
         .distance {
-            color: #6c757d;
+            color: #64748b;
             font-style: italic;
+            font-size: 0.85em;
         }
-        
+
+        /* Input area and send button with blue gradient */
         .input-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-top: 1px solid #e2e8f0;
         }
+
         input[type="text"] {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
         }
-        button {
-            padding: 12px 20px;
-            background-color: #007bff;
+
+        input[type="text"]:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .send-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
         }
-        button:disabled {
-            background-color: #6c757d;
+
+        .send-btn:disabled {
+            background: #94a3b8;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
-        .location-button {
-            background-color: #28a745;
-        }
-        .location-button:hover {
-            background-color: #218838;
-        }
+
         .status {
             text-align: center;
-            margin: 10px 0;
+            padding: 10px 20px;
             font-style: italic;
-            color: #666;
+            color: #64748b;
+            font-size: 0.9rem;
+            background: #f8f9ff;
         }
-        .quick-actions {
+
+        /* Location buttons with blue gradient */
+        .location-buttons {
             margin: 15px 0;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            text-align: center;
         }
-        .quick-btn {
-            padding: 8px 15px;
-            background-color: #6c757d;
+
+        .location-btn {
+            display: inline-block;
+            margin: 5px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
         }
-        .quick-btn:hover {
-            background-color: #5a6268;
+
+        .location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            max-width: 75%;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #64748b;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
+            30% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            .chat-container {
+                border-radius: 15px;
+            }
+            
+            .messages {
+                height: 400px;
+                padding: 15px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .quick-actions {
+                padding: 15px;
+                gap: 8px;
+            }
+            
+            .quick-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .input-container {
+                padding: 15px;
+                gap: 10px;
+            }
+            
+            input[type="text"] {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .send-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <h1>🌐 Chatbot</h1>
+        <div class="chat-header">
+            <!-- Logo placeholder or a simplified logo -->
+            <h1 style="font-size: 2.2rem; margin-top: 10px;">
+                <img src="logo.png" alt="SLT-Mobitel Logo" style="height: 48px; vertical-align: middle;">
+            </h1>
+            <h1>SLT-Mobitel Assistant</h1>
+            <p>Your intelligent guide to SLT-Mobitel services, packages, and support</p>
+        </div>
         
         <div class="quick-actions">
-            <button class="quick-btn" onclick="sendMessage('Hi')">👋 Say Hi</button>
-            <button class="quick-btn" onclick="sendMessage('What are SLT broadband packages?')">📶 Broadband</button>
-            <button class="quick-btn" onclick="sendMessage('Tell me about PEO TV')">📺 PEO TV</button>
-            <button class="quick-btn" onclick="requestNearestBranches()">📍 Find Nearest Branches</button>
+            <button class="quick-btn" onclick="sendMessage('Hi there!')">Hello</button>
+            <button class="quick-btn" onclick="sendMessage('What are the latest broadband packages?')">Broadband Packages</button>
+            <button class="quick-btn" onclick="sendMessage('Tell me about PEO TV')">PEO TV</button>
+            <button class="quick-btn" onclick="sendMessage('How do I register for SLT services?')">Registration</button>
+            <button class="quick-btn" onclick="requestNearestBranches()">Find Branches</button>
         </div>
         
         <div class="messages" id="messages"></div>
         
         <div class="input-container">
-            <input type="text" id="messageInput" placeholder="Ask about SLT services..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()" id="sendBtn">Send</button>
+            <input type="text" id="messageInput" placeholder="Ask about SLT services, packages, registration..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()" id="sendBtn">Send</button>
         </div>
         
         <div class="status" id="status"></div>
@@ -220,13 +458,14 @@
 
     <script>
         const API_BASE = 'http://localhost:4321';
+        let isTyping = false;
         
-        // Markdown parsing function
+        // Enhanced markdown parsing
         function parseMarkdown(text) {
-            // Handle branch-specific formatting first
-            text = formatBranchInfo(text);
+            if (text.includes('📍') && text.includes('km away')) {
+                text = formatBranchInfo(text);
+            }
             
-            // Convert markdown to HTML
             return text
                 // Headers
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
@@ -239,85 +478,128 @@
                 // Italic text
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
                 
-                // Links with markdown syntax [text](url)
+                // Links
                 .replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>')
-                
-                // Automatic links (http/https)
                 .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
                 
-                // Lists (handle • and - bullets)
+                // Lists
                 .replace(/^[•\-] (.*)$/gm, '<li>$1</li>')
                 .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-                
-                // Numbered lists
-                .replace(/^\d+\.\s(.*)$/gm, '<li>$1</li>')
                 
                 // Line breaks
                 .replace(/\n\n/g, '<br><br>')
                 .replace(/\n/g, '<br>');
         }
         
-        // Special formatting for branch information
         function formatBranchInfo(text) {
-            // Check if this is branch information
-            if (text.includes('📍') && text.includes('km away')) {
-                // Split into sections
-                const sections = text.split(/\n\s*\n/);
-                let formatted = '';
-                
-                sections.forEach(section => {
-                    if (section.includes('📍') && section.includes('km away')) {
-                        // This is a branch entry
-                        const lines = section.split('\n');
-                        formatted += '<div class="branch-info">';
-                        
-                        lines.forEach(line => {
-                            line = line.trim();
-                            if (line.includes('📍') && line.includes('km away')) {
-                                // Branch name and distance
-                                const match = line.match(/📍 \*\*(.*?)\*\* – ([\d.]+) km away/);
-                                if (match) {
-                                    formatted += `<div class="branch-name">📍 ${match[1]}</div>`;
-                                    formatted += `<div class="distance">${match[2]} km away</div>`;
-                                }
-                            } else if (line.includes('🏠')) {
-                                formatted += `<div class="branch-detail">${line}</div>`;
-                            } else if (line.includes('📞')) {
-                                formatted += `<div class="branch-detail">${line}</div>`;
-                            } else if (line.includes('📧')) {
-                                formatted += `<div class="branch-detail">${line}</div>`;
-                            } else if (line.includes('🕒')) {
-                                formatted += `<div class="branch-detail">${line}</div>`;
-                            }
-                        });
-                        
-                        formatted += '</div>';
-                    } else {
-                        // Regular section
-                        formatted += section + '\n\n';
-                    }
-                });
-                
-                return formatted;
-            }
+            if (!text.includes('📍') || !text.includes('km away')) return text;
             
-            return text;
+            const sections = text.split(/\n\s*\n/);
+            let formatted = '';
+            
+            sections.forEach(section => {
+                if (section.includes('📍') && section.includes('km away')) {
+                    const lines = section.split('\n');
+                    formatted += '<div class="branch-info">';
+                    
+                    lines.forEach(line => {
+                        line = line.trim();
+                        if (line.includes('📍') && line.includes('km away')) {
+                            const match = line.match(/📍 \*\*(.*?)\*\* – ([\d.]+) km away/);
+                            if (match) {
+                                formatted += `<div class="branch-name">📍 ${match[1]}</div>`;
+                                formatted += `<div class="distance">${match[2]} km away</div>`;
+                            }
+                        } else if (line.includes('🏠') || line.includes('📞') || line.includes('📧') || line.includes('🕒')) {
+                            formatted += `<div class="branch-detail">${line}</div>`;
+                        }
+                    });
+                    
+                    formatted += '</div>';
+                } else {
+                    formatted += section + '\n\n';
+                }
+            });
+            
+            return formatted;
         }
         
-        function addMessage(content, isUser = false) {
+        function addMessage(content, isUser = false, actionButtons = []) {
             const messages = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
             if (isUser) {
-                messageDiv.textContent = content;
+                messageContent.textContent = content;
             } else {
-                // Parse markdown for bot messages
-                messageDiv.innerHTML = parseMarkdown(content);
+                messageContent.innerHTML = parseMarkdown(content);
+                
+                // Add action buttons if provided
+                if (actionButtons && actionButtons.length > 0) {
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'action-buttons';
+                    
+                    actionButtons.forEach(button => {
+                        if (button.url) {
+                            const btnElement = document.createElement('a');
+                            btnElement.href = button.url;
+                            btnElement.className = `action-btn ${button.type || ''}`;
+                            btnElement.textContent = button.text;
+                            btnElement.title = button.title || '';
+                            btnElement.target = button.url.startsWith('http') ? '_blank' : '_self';
+                            buttonContainer.appendChild(btnElement);
+                        } else if (button.action === 'send_message') {
+                            const btnElement = document.createElement('button');
+                            btnElement.className = `action-btn ${button.type || ''}`;
+                            btnElement.textContent = button.text;
+                            btnElement.title = button.title || '';
+                            btnElement.onclick = () => sendMessage(button.message);
+                            buttonContainer.appendChild(btnElement);
+                        }
+                    });
+                    
+                    messageContent.appendChild(buttonContainer);
+                }
             }
             
+            messageDiv.appendChild(messageContent);
             messages.appendChild(messageDiv);
             messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const messages = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message';
+            typingDiv.id = 'typing-indicator';
+            
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span>SLT Assistant is typing</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            
+            messages.appendChild(typingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            isTyping = false;
         }
         
         function setStatus(text) {
@@ -325,7 +607,8 @@
         }
         
         function handleKeyPress(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendMessage();
             }
         }
@@ -343,14 +626,13 @@
             
             addMessage(userMessage, true);
             sendBtn.disabled = true;
-            setStatus('🤖 Thinking...');
+            sendBtn.innerHTML = '<span class="loading"></span>';
+            showTypingIndicator();
             
             try {
                 const response = await fetch(`${API_BASE}/chat`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: userMessage,
                         user_id: 'web_user'
@@ -358,46 +640,45 @@
                 });
                 
                 const data = await response.json();
+                hideTypingIndicator();
                 
                 if (data.error) {
                     addMessage(`❌ Error: ${data.error}`);
                 } else {
-                    addMessage(data.reply);
+                    addMessage(data.reply, false, data.action_buttons);
                     
-                    // Check if location sharing is requested
                     if (data.request_location) {
-                        setTimeout(() => {
-                            addLocationRequestButtons();
-                        }, 500);
+                        setTimeout(() => addLocationRequestButtons(), 500);
                     }
                     
-                    // Show which LLM was used
                     if (data.llm_used) {
-                        setStatus(`✅ Response from ${data.llm_used}`);
+                        setStatus(`✨ Response powered by ${data.llm_used}`);
+                        setTimeout(() => setStatus(''), 3000);
                     }
                 }
             } catch (error) {
-                addMessage(`❌ Network error: ${error.message}`);
+                hideTypingIndicator();
+                addMessage(`❌ Connection error: ${error.message}`);
                 setStatus('❌ Connection failed');
             } finally {
                 sendBtn.disabled = false;
-                setStatus('');
+                sendBtn.textContent = 'Send';
             }
         }
         
         function addLocationRequestButtons() {
             const messages = document.getElementById('messages');
             const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'location-buttons';
             buttonContainer.innerHTML = `
-                <div style="text-align: center; margin: 10px 0;">
-                    <button class="location-button" onclick="shareLocation()" style="margin: 5px;">
-                        📍 Share My Location
-                    </button>
-                    <br>
-                    <button class="quick-btn" onclick="sendMessage('Colombo')" style="margin: 5px;">Colombo</button>
-                    <button class="quick-btn" onclick="sendMessage('Kandy')" style="margin: 5px;">Kandy</button>
-                    <button class="quick-btn" onclick="sendMessage('Galle')" style="margin: 5px;">Galle</button>
-                </div>
+                <button class="location-btn" onclick="shareLocation()">
+                    📍 Share My Location
+                </button>
+                <br>
+                <button class="quick-btn" onclick="sendMessage('Colombo branches')" style="margin: 5px;">Colombo</button>
+                <button class="quick-btn" onclick="sendMessage('Kandy branches')" style="margin: 5px;">Kandy</button>
+                <button class="quick-btn" onclick="sendMessage('Galle branches')" style="margin: 5px;">Galle</button>
+                <button class="quick-btn" onclick="sendMessage('Negombo branches')" style="margin: 5px;">Negombo</button>
             `;
             messages.appendChild(buttonContainer);
             messages.scrollTop = messages.scrollHeight;
@@ -405,7 +686,7 @@
         
         async function shareLocation() {
             if (!navigator.geolocation) {
-                addMessage('❌ Geolocation is not supported by this browser.');
+                addMessage('❌ Geolocation not supported by this browser.');
                 return;
             }
             
@@ -414,19 +695,13 @@
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     const { latitude, longitude } = position.coords;
-                    
                     setStatus('🔍 Finding nearest branches...');
                     
                     try {
                         const response = await fetch(`${API_BASE}/location`, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                latitude: latitude,
-                                longitude: longitude
-                            })
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ latitude, longitude })
                         });
                         
                         const data = await response.json();
@@ -435,7 +710,7 @@
                             addMessage(`❌ ${data.error}`);
                         } else {
                             addMessage(`📍 <em>Using your current location</em>`);
-                            addMessage(data.reply);
+                            addMessage(data.reply, false, data.action_buttons);
                         }
                     } catch (error) {
                         addMessage(`❌ Error processing location: ${error.message}`);
@@ -444,28 +719,20 @@
                     }
                 },
                 (error) => {
-                    let errorMessage = '❌ ';
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage += 'Location access denied. Please enable location sharing or enter your city manually.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage += 'Location information unavailable. Please enter your city manually.';
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage += 'Location request timed out. Please try again or enter your city manually.';
-                            break;
-                        default:
-                            errorMessage += 'An unknown error occurred while getting location.';
-                            break;
-                    }
-                    addMessage(errorMessage);
+                    const errorMessages = {
+                        1: 'Location access denied. Please enable location sharing or enter your city manually.',
+                        2: 'Location information unavailable. Please enter your city manually.',
+                        3: 'Location request timed out. Please try again or enter your city manually.',
+                        default: 'An unknown error occurred while getting location.'
+                    };
+                    
+                    addMessage(`❌ ${errorMessages[error.code] || errorMessages.default}`);
                     setStatus('');
                 },
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 300000 // 5 minutes
+                    maximumAge: 300000
                 }
             );
         }
@@ -475,8 +742,20 @@
         }
         
         // Initialize
-        addMessage('👋 Hello! I\'m your SLT assistant. How can I help you today?');
-        setStatus('✅ Ready to help!');
+        window.addEventListener('load', () => {
+            addMessage("👋 Hi! I'm your SLT-Mobitel assistant.\n\nI can help with:\n📶 Broadband\n📺 PEO TV\n📝 Account setup\n📍 Branch info\n🛠️ Tech support\n\nHow can I help you today?");
+
+            setStatus('🟢 Ready to help!');
+            // Focus on input
+            document.getElementById('messageInput').focus();
+        });
+        
+        // Auto-resize input on mobile
+        const input = document.getElementById('messageInput');
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
     </script>
 </body>
 </html>
