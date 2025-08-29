@@ -675,13 +675,60 @@
                     📍 Share My Location
                 </button>
                 <br>
-                <button class="quick-btn" onclick="sendMessage('Colombo branches')" style="margin: 5px;">Colombo</button>
-                <button class="quick-btn" onclick="sendMessage('Kandy branches')" style="margin: 5px;">Kandy</button>
-                <button class="quick-btn" onclick="sendMessage('Galle branches')" style="margin: 5px;">Galle</button>
-                <button class="quick-btn" onclick="sendMessage('Negombo branches')" style="margin: 5px;">Negombo</button>
+                <input type="text" id="cityInput" placeholder="Enter your city..." style="margin: 10px 0; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 25px; font-size: 0.95rem; width: 60%; max-width: 320px; outline: none; background: white;">
+                <button class="quick-btn" onclick="sendCity()" style="margin-left: 8px; padding: 12px 24px;">Find Branches</button>
             `;
             messages.appendChild(buttonContainer);
             messages.scrollTop = messages.scrollHeight;
+            // Focus on the city input when shown
+            setTimeout(() => {
+                const cityInput = document.getElementById('cityInput');
+                if (cityInput) cityInput.focus();
+            }, 100);
+        }
+
+        // New function: sendCity
+        async function sendCity() {
+            const cityInput = document.getElementById('cityInput');
+            if (!cityInput) return;
+            const city = cityInput.value.trim();
+            if (!city) {
+                cityInput.focus();
+                return;
+            }
+            // Add user message to chat
+            addMessage(city, true);
+            cityInput.value = '';
+            showTypingIndicator();
+            setStatus('');
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: city,
+                        user_id: 'web_user'
+                    })
+                });
+                const data = await response.json();
+                hideTypingIndicator();
+                if (data.error) {
+                    addMessage(`❌ Error: ${data.error}`);
+                } else {
+                    addMessage(data.reply, false, data.action_buttons);
+                    if (data.request_location) {
+                        setTimeout(() => addLocationRequestButtons(), 500);
+                    }
+                    if (data.llm_used) {
+                        setStatus(`✨ Response powered by ${data.llm_used}`);
+                        setTimeout(() => setStatus(''), 3000);
+                    }
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage(`❌ Connection error: ${error.message}`);
+                setStatus('❌ Connection failed');
+            }
         }
         
         async function shareLocation() {

@@ -4,3 +4,11 @@ geopy
 langchain-community
 httpx
 google-generativeai
+
+playwright
+asyncio
+beautifulsoup4
+langchain
+langchain-community
+chromadb
+sentence-transformers
