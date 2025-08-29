@@ -3,234 +3,1020 @@
         "title": "Trio Vibe",
         "data_amount": "40GB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.3530Startup Fee:Rs.500"
+        "price": " RRs.3530 Rs.500",
+        "speed": "40GB",
+        "validity": null,
+        "description": "Data Bundle40GBFibreAnytime Data40GB",
+        "card_index": 1
+    },
+    {
+        "title": "Trio Vibe Plus",
+        "data_amount": "40GB",
+        "bundle_name": "Fibre",
+        "price": " RRs.4100 Rs.500",
+        "speed": "40GB",
+        "validity": null,
+        "description": "Data Bundle40GBFibreAnytime Data40GB",
+        "card_index": 2
+    },
+    {
+        "title": "Trio Shine",
+        "data_amount": "100",
+        "bundle_name": "Fibre",
+        "price": " RRs.4950 Rs.500",
+        "speed": "100 GB",
+        "validity": null,
+        "description": "Data Bundle100FibreAnytime Data100 GB",
+        "card_index": 3
+    },
+    {
+        "title": "HBB Anytime 50GB",
+        "data_amount": "50GB",
+        "bundle_name": "4G",
+        "price": " RRs.1290 Rs.1290",
+        "speed": "50GB",
+        "validity": null,
+        "description": "Data Bundle50GB4GAnytime Data50GB",
+        "card_index": 4
+    },
+    {
+        "title": "Any Beat",
+        "data_amount": "36",
+        "bundle_name": "ADSL",
+        "price": " RRs.1550 Rs.500",
+        "speed": "36 GB",
+        "validity": null,
+        "description": "Data Bundle36ADSLAnytime Data36 GB",
+        "card_index": 5
+    },
+    {
+        "title": "HBB Anytime 85GB",
+        "data_amount": "85GB",
+        "bundle_name": "4G",
+        "price": " RRs.1890 Rs.1890",
+        "speed": "85GB",
+        "validity": null,
+        "description": "Data Bundle85GB4GAnytime Data85GB",
+        "card_index": 6
+    },
+    {
+        "title": "Any Flix",
+        "data_amount": "58",
+        "bundle_name": "Fibre",
+        "price": " RRs.2150 Rs.500",
+        "speed": "58 GB",
+        "validity": null,
+        "description": "Data Bundle58FibreAnytime Data58 GB53ADSLAnytime Data53 GB",
+        "card_index": 7
+    },
+    {
+        "title": "HBB Anytime 115GB",
+        "data_amount": "115GB",
+        "bundle_name": "4G",
+        "price": " RRs.2590 Rs.2590",
+        "speed": "115GB",
+        "validity": null,
+        "description": "Data Bundle115GB4GAnytime Data115GB",
+        "card_index": 8
+    },
+    {
+        "title": "Any Tide",
+        "data_amount": "120",
+        "bundle_name": "Fibre",
+        "price": " RRs.3890 Rs.500",
+        "speed": "120 GB",
+        "validity": null,
+        "description": "Data Bundle120FibreAnytime Data120 GB100ADSLAnytime Data100 GB",
+        "card_index": 9
+    },
+    {
+        "title": "HBB Anytime 200GB",
+        "data_amount": "200GB",
+        "bundle_name": "4G",
+        "price": " RRs.3990 Rs.3990",
+        "speed": "200GB",
+        "validity": null,
+        "description": "Data Bundle200GB4GAnytime Data200GB",
+        "card_index": 10
+    },
+    {
+        "title": "HBB Anytime 400GB",
+        "data_amount": "400GB",
+        "bundle_name": "4G",
+        "price": " RRs.7990 Rs.7990",
+        "speed": "400GB",
+        "validity": null,
+        "description": "Data Bundle400GB4GAnytime Data400GB",
+        "card_index": 11
+    },
+    {
+        "title": "Ultra Flash Prime",
+        "data_amount": "200GB",
+        "bundle_name": "Fibre",
+        "price": " RRs.75000 Rs.500",
+        "speed": "200GB",
+        "validity": null,
+        "description": "Data Bundle200GBFibreAnytime Data200GB per day + unlimited Entertainment Bundle + Unlimited Calls",
+        "card_index": 12
+    },
+    {
+        "title": "Ultra Prime",
+        "data_amount": "5TB",
+        "bundle_name": "Fibre",
+        "price": " RRs.75000 Rs.500",
+        "speed": null,
+        "validity": null,
+        "description": "Data Bundle5TBFibreAnytime Data5TB + unlimited Entertainment Bundle + Unlimited Calls",
+        "card_index": 13
     },
     {
         "title": "Trio Vibe",
         "data_amount": "40GB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.3530Startup Fee:Rs.500"
+        "price": " RRs.3530 Rs.500",
+        "speed": "40GB",
+        "validity": null,
+        "description": "Data Bundle40GBFibreAnytime Data40GB",
+        "card_index": 14
     },
     {
         "title": "Trio Vibe Plus",
         "data_amount": "40GB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.4100Startup Fee:Rs.500"
-    },
-    {
-        "title": "Trio Vibe Plus",
-        "data_amount": "40GB",
-        "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.4100Startup Fee:Rs.500"
-    },
-    {
-        "title": "Trio Shine",
-        "data_amount": "100",
-        "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.4950Startup Fee:Rs.500"
+        "price": " RRs.4100 Rs.500",
+        "speed": "40GB",
+        "validity": null,
+        "description": "Data Bundle40GBFibreAnytime Data40GB",
+        "card_index": 15
     },
     {
         "title": "Trio Shine",
         "data_amount": "100",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.4950Startup Fee:Rs.500"
+        "price": " RRs.4950 Rs.500",
+        "speed": "100 GB",
+        "validity": null,
+        "description": "Data Bundle100FibreAnytime Data100 GB",
+        "card_index": 16
     },
     {
         "title": "HBB Anytime 50GB",
         "data_amount": "50GB",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.1290Startup Fee:Rs.1290"
-    },
-    {
-        "title": "HBB Anytime 50GB",
-        "data_amount": "50GB",
-        "bundle_name": "4G",
-        "price": "Monthly RentalRs.1290Startup Fee:Rs.1290"
-    },
-    {
-        "title": "Any Beat",
-        "data_amount": "36",
-        "bundle_name": "ADSL",
-        "price": "Monthly RentalRs.1550Startup Fee:Rs.500"
+        "price": " RRs.1290 Rs.1290",
+        "speed": "50GB",
+        "validity": null,
+        "description": "Data Bundle50GB4GAnytime Data50GB",
+        "card_index": 17
     },
     {
         "title": "Any Beat",
         "data_amount": "36",
         "bundle_name": "ADSL",
-        "price": "Monthly RentalRs.1550Startup Fee:Rs.500"
+        "price": " RRs.1550 Rs.500",
+        "speed": "36 GB",
+        "validity": null,
+        "description": "Data Bundle36ADSLAnytime Data36 GB",
+        "card_index": 18
     },
     {
         "title": "HBB Anytime 85GB",
         "data_amount": "85GB",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.1890Startup Fee:Rs.1890"
-    },
-    {
-        "title": "HBB Anytime 85GB",
-        "data_amount": "85GB",
-        "bundle_name": "4G",
-        "price": "Monthly RentalRs.1890Startup Fee:Rs.1890"
-    },
-    {
-        "title": "Any Flix",
-        "data_amount": "58",
-        "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.2150Startup Fee:Rs.500"
+        "price": " RRs.1890 Rs.1890",
+        "speed": "85GB",
+        "validity": null,
+        "description": "Data Bundle85GB4GAnytime Data85GB",
+        "card_index": 19
     },
     {
         "title": "Any Flix",
         "data_amount": "58",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.2150Startup Fee:Rs.500"
+        "price": " RRs.2150 Rs.500",
+        "speed": "58 GB",
+        "validity": null,
+        "description": "Data Bundle58FibreAnytime Data58 GB53ADSLAnytime Data53 GB",
+        "card_index": 20
     },
     {
         "title": "Unlimited LTE Flash 5",
         "data_amount": "Daily",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.2350Startup Fee:Rs.500"
+        "price": " RRs.2350 Rs.500",
+        "speed": "5GB",
+        "validity": null,
+        "description": "Data BundleDaily4GUnlimited DataDaily 5GB at standard LTE speed",
+        "card_index": 21
     },
     {
         "title": "HBB Anytime 115GB",
         "data_amount": "115GB",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.2590Startup Fee:Rs.2590"
-    },
-    {
-        "title": "HBB Anytime 115GB",
-        "data_amount": "115GB",
-        "bundle_name": "4G",
-        "price": "Monthly RentalRs.2590Startup Fee:Rs.2590"
+        "price": " RRs.2590 Rs.2590",
+        "speed": "115GB",
+        "validity": null,
+        "description": "Data Bundle115GB4GAnytime Data115GB",
+        "card_index": 22
     },
     {
         "title": "LTE Unlimited 2",
         "data_amount": "Up",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.2950Startup Fee:Rs.500"
+        "price": " RRs.2950 Rs.500",
+        "speed": "2Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 2Mbps speed",
+        "card_index": 23
     },
     {
         "title": "Any Tide",
         "data_amount": "120",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.3890Startup Fee:Rs.500"
-    },
-    {
-        "title": "Any Tide",
-        "data_amount": "120",
-        "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.3890Startup Fee:Rs.500"
-    },
-    {
-        "title": "HBB Anytime 200GB",
-        "data_amount": "200GB",
-        "bundle_name": "4G",
-        "price": "Monthly RentalRs.3990Startup Fee:Rs.3990"
+        "price": " RRs.3890 Rs.500",
+        "speed": "120 GB",
+        "validity": null,
+        "description": "Data Bundle120FibreAnytime Data120 GB100ADSLAnytime Data100 GB",
+        "card_index": 24
     },
     {
         "title": "HBB Anytime 200GB",
         "data_amount": "200GB",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.3990Startup Fee:Rs.3990"
+        "price": " RRs.3990 Rs.3990",
+        "speed": "200GB",
+        "validity": null,
+        "description": "Data Bundle200GB4GAnytime Data200GB",
+        "card_index": 25
     },
     {
         "title": "Unlimited LTE Flash 10",
         "data_amount": "Daily",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.4090Startup Fee:Rs.500"
+        "price": " RRs.4090 Rs.500",
+        "speed": "10GB",
+        "validity": null,
+        "description": "Data BundleDaily4GUnlimited DataDaily 10GB at standard LTE speed",
+        "card_index": 26
     },
     {
         "title": "LTE Unlimited 4",
         "data_amount": "Up",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.5150Startup Fee:Rs.500"
+        "price": " RRs.5150 Rs.500",
+        "speed": "4Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 4Mbps speed",
+        "card_index": 27
     },
     {
         "title": "ADSL Unlimited 4",
         "data_amount": "Up",
         "bundle_name": "ADSL",
-        "price": "Monthly RentalRs.5790Startup Fee:Rs.500"
+        "price": " RRs.5790 Rs.500",
+        "speed": "4Mbps",
+        "validity": null,
+        "description": "Data BundleUpADSLUnlimited DataUp to 4Mbps speed",
+        "card_index": 28
     },
     {
         "title": "Fibre Unlimited Flash 10",
         "data_amount": "Daily",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.5990Startup Fee:Rs.500"
+        "price": " RRs.5990 Rs.500",
+        "speed": "10GB",
+        "validity": null,
+        "description": "Data BundleDailyFibreUnlimited DataDaily 10GB up to 300Mbps (Thereafter 1Mbps)",
+        "card_index": 29
     },
     {
         "title": "LTE Unlimited 8",
         "data_amount": "Up",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.7090Startup Fee:Rs.500"
+        "price": " RRs.7090 Rs.500",
+        "speed": "8Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 8Mbps speed",
+        "card_index": 30
     },
     {
         "title": "ADSL Unlimited 8",
         "data_amount": "Up",
         "bundle_name": "ADSL",
-        "price": "Monthly RentalRs.7490Startup Fee:Rs.500"
+        "price": " RRs.7490 Rs.500",
+        "speed": "8Mbps",
+        "validity": null,
+        "description": "Data BundleUpADSLUnlimited DataUp to 8Mbps speed",
+        "card_index": 31
     },
     {
         "title": "HBB Anytime 400GB",
         "data_amount": "400GB",
         "bundle_name": "4G",
-        "price": "Monthly RentalRs.7990Startup Fee:Rs.7990"
-    },
-    {
-        "title": "HBB Anytime 400GB",
-        "data_amount": "400GB",
-        "bundle_name": "4G",
-        "price": "Monthly RentalRs.7990Startup Fee:Rs.7990"
+        "price": " RRs.7990 Rs.7990",
+        "speed": "400GB",
+        "validity": null,
+        "description": "Data Bundle400GB4GAnytime Data400GB",
+        "card_index": 32
     },
     {
         "title": "Fibre Unlimited Flash 25",
         "data_amount": "Daily",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.10390Startup Fee:Rs.500"
+        "price": " RRs.10390 Rs.500",
+        "speed": "25GB",
+        "validity": null,
+        "description": "Data BundleDailyFibreUnlimited DataDaily 25GB up to 300Mbps (Thereafter 1Mbps)",
+        "card_index": 33
     },
     {
         "title": "Speed-based Fibre Unlimited Family",
         "data_amount": "100",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.7900Startup Fee:Rs.0"
+        "price": " RRs.7900 Rs.0",
+        "speed": "100 Mbps",
+        "validity": null,
+        "description": "Data Bundle100FibreUnlimited Data100 Mbps/ 50 Mbps + Unlimited Calls",
+        "card_index": 34
     },
     {
         "title": "Speed-based Fibre Unlimited Boost",
         "data_amount": "300",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.14900Startup Fee:Rs.0"
+        "price": " RRs.14900 Rs.0",
+        "speed": "300 Mbps",
+        "validity": null,
+        "description": "Data Bundle300FibreUnlimited Data300 Mbps/100 Mbps + Unlimited Calls",
+        "card_index": 35
     },
     {
         "title": "Speed-based Fibre Unlimited Blast",
         "data_amount": "600",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.27900Startup Fee:Rs.0"
+        "price": " RRs.27900 Rs.0",
+        "speed": "600 Mbps",
+        "validity": null,
+        "description": "Data Bundle600FibreUnlimited Data600 Mbps/200 Mbps + Unlimited Calls",
+        "card_index": 36
     },
     {
         "title": "Speed-based Fibre Unlimited Turbo",
         "data_amount": "1000",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.39900Startup Fee:Rs.0"
+        "price": " RRs.39900 Rs.0",
+        "speed": "1000 Mbps",
+        "validity": null,
+        "description": "Data Bundle1000FibreUnlimited Data1000 Mbps/300 Mbps + Unlimited Calls",
+        "card_index": 37
     },
     {
         "title": "Ultra Flash Prime",
         "data_amount": "200GB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.75000Startup Fee:Rs.500"
+        "price": " RRs.75000 Rs.500",
+        "speed": "200GB",
+        "validity": null,
+        "description": "Data Bundle200GBFibreAnytime Data200GB per day + unlimited Entertainment Bundle + Unlimited Calls",
+        "card_index": 38
     },
     {
-        "title": "Ultra Flash Prime",
+        "title": "Ultra Prime",
+        "data_amount": "5TB",
+        "bundle_name": "Fibre",
+        "price": " RRs.75000 Rs.500",
+        "speed": null,
+        "validity": null,
+        "description": "Data Bundle5TBFibreAnytime Data5TB + unlimited Entertainment Bundle + Unlimited Calls",
+        "card_index": 39
+    },
+    {
+        "title": null,
+        "data_amount": "40GB",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "40GB",
+        "validity": null,
+        "description": null,
+        "card_index": 40
+    },
+    {
+        "title": "Rs.3530",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.3530",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 41
+    },
+    {
+        "title": "Rs.4100",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.4100",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 43
+    },
+    {
+        "title": null,
+        "data_amount": "100",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "100 GB",
+        "validity": null,
+        "description": null,
+        "card_index": 44
+    },
+    {
+        "title": "Rs.4950",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.4950",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 45
+    },
+    {
+        "title": null,
+        "data_amount": "50GB",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "50GB",
+        "validity": null,
+        "description": null,
+        "card_index": 46
+    },
+    {
+        "title": "Rs.1290",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.1290",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 47
+    },
+    {
+        "title": null,
+        "data_amount": "36",
+        "bundle_name": "ADSL",
+        "price": null,
+        "speed": "36 GB",
+        "validity": null,
+        "description": null,
+        "card_index": 48
+    },
+    {
+        "title": "Rs.1550",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.1550",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 49
+    },
+    {
+        "title": null,
+        "data_amount": "85GB",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "85GB",
+        "validity": null,
+        "description": null,
+        "card_index": 50
+    },
+    {
+        "title": "Rs.1890",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.1890",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 51
+    },
+    {
+        "title": null,
+        "data_amount": "58",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "58 GB",
+        "validity": null,
+        "description": null,
+        "card_index": 52
+    },
+    {
+        "title": "Rs.2150",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.2150",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 53
+    },
+    {
+        "title": "Unlimited LTE Flash 5",
+        "data_amount": "Daily",
+        "bundle_name": "4G",
+        "price": " RRs.2350 Rs.500",
+        "speed": "5GB",
+        "validity": null,
+        "description": "Data BundleDaily4GUnlimited DataDaily 5GB at standard LTE speed",
+        "card_index": 54
+    },
+    {
+        "title": null,
+        "data_amount": "Daily",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "5GB",
+        "validity": null,
+        "description": null,
+        "card_index": 55
+    },
+    {
+        "title": "Rs.2350",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.2350",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 56
+    },
+    {
+        "title": null,
+        "data_amount": "115GB",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "115GB",
+        "validity": null,
+        "description": null,
+        "card_index": 57
+    },
+    {
+        "title": "Rs.2590",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.2590",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 58
+    },
+    {
+        "title": "LTE Unlimited 2",
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": " RRs.2950 Rs.500",
+        "speed": "2Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 2Mbps speed",
+        "card_index": 59
+    },
+    {
+        "title": null,
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "2Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 60
+    },
+    {
+        "title": "Rs.2950",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.2950",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 61
+    },
+    {
+        "title": null,
+        "data_amount": "120",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "120 GB",
+        "validity": null,
+        "description": null,
+        "card_index": 62
+    },
+    {
+        "title": "Rs.3890",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.3890",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 63
+    },
+    {
+        "title": null,
+        "data_amount": "200GB",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "200GB",
+        "validity": null,
+        "description": null,
+        "card_index": 64
+    },
+    {
+        "title": "Rs.3990",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.3990",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 65
+    },
+    {
+        "title": "Unlimited LTE Flash 10",
+        "data_amount": "Daily",
+        "bundle_name": "4G",
+        "price": " RRs.4090 Rs.500",
+        "speed": "10GB",
+        "validity": null,
+        "description": "Data BundleDaily4GUnlimited DataDaily 10GB at standard LTE speed",
+        "card_index": 66
+    },
+    {
+        "title": null,
+        "data_amount": "Daily",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "10GB",
+        "validity": null,
+        "description": null,
+        "card_index": 67
+    },
+    {
+        "title": "Rs.4090",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.4090",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 68
+    },
+    {
+        "title": "LTE Unlimited 4",
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": " RRs.5150 Rs.500",
+        "speed": "4Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 4Mbps speed",
+        "card_index": 69
+    },
+    {
+        "title": null,
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "4Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 70
+    },
+    {
+        "title": "Rs.5150",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.5150",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 71
+    },
+    {
+        "title": "ADSL Unlimited 4",
+        "data_amount": "Up",
+        "bundle_name": "ADSL",
+        "price": " RRs.5790 Rs.500",
+        "speed": "4Mbps",
+        "validity": null,
+        "description": "Data BundleUpADSLUnlimited DataUp to 4Mbps speed",
+        "card_index": 72
+    },
+    {
+        "title": null,
+        "data_amount": "Up",
+        "bundle_name": "ADSL",
+        "price": null,
+        "speed": "4Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 73
+    },
+    {
+        "title": "Rs.5790",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.5790",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 74
+    },
+    {
+        "title": "Fibre Unlimited Flash 10",
+        "data_amount": "Daily",
+        "bundle_name": "Fibre",
+        "price": " RRs.5990 Rs.500",
+        "speed": "10GB",
+        "validity": null,
+        "description": "Data BundleDailyFibreUnlimited DataDaily 10GB up to 300Mbps (Thereafter 1Mbps)",
+        "card_index": 75
+    },
+    {
+        "title": null,
+        "data_amount": "Daily",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "10GB",
+        "validity": null,
+        "description": null,
+        "card_index": 76
+    },
+    {
+        "title": "Rs.5990",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.5990",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 77
+    },
+    {
+        "title": "LTE Unlimited 8",
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": " RRs.7090 Rs.500",
+        "speed": "8Mbps",
+        "validity": null,
+        "description": "Data BundleUp4GUnlimited DataUp to 8Mbps speed",
+        "card_index": 78
+    },
+    {
+        "title": null,
+        "data_amount": "Up",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "8Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 79
+    },
+    {
+        "title": "Rs.7090",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.7090",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 80
+    },
+    {
+        "title": "ADSL Unlimited 8",
+        "data_amount": "Up",
+        "bundle_name": "ADSL",
+        "price": " RRs.7490 Rs.500",
+        "speed": "8Mbps",
+        "validity": null,
+        "description": "Data BundleUpADSLUnlimited DataUp to 8Mbps speed",
+        "card_index": 81
+    },
+    {
+        "title": null,
+        "data_amount": "Up",
+        "bundle_name": "ADSL",
+        "price": null,
+        "speed": "8Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 82
+    },
+    {
+        "title": "Rs.7490",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.7490",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 83
+    },
+    {
+        "title": null,
+        "data_amount": "400GB",
+        "bundle_name": "4G",
+        "price": null,
+        "speed": "400GB",
+        "validity": null,
+        "description": null,
+        "card_index": 84
+    },
+    {
+        "title": "Rs.7990",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.7990",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 85
+    },
+    {
+        "title": "Fibre Unlimited Flash 25",
+        "data_amount": "Daily",
+        "bundle_name": "Fibre",
+        "price": " RRs.10390 Rs.500",
+        "speed": "25GB",
+        "validity": null,
+        "description": "Data BundleDailyFibreUnlimited DataDaily 25GB up to 300Mbps (Thereafter 1Mbps)",
+        "card_index": 86
+    },
+    {
+        "title": null,
+        "data_amount": "Daily",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "25GB",
+        "validity": null,
+        "description": null,
+        "card_index": 87
+    },
+    {
+        "title": "Rs.10390",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.10390",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 88
+    },
+    {
+        "title": "Speed-based Fibre Unlimited Family",
+        "data_amount": "100",
+        "bundle_name": "Fibre",
+        "price": " RRs.7900 Rs.0",
+        "speed": "100 Mbps",
+        "validity": null,
+        "description": "Data Bundle100FibreUnlimited Data100 Mbps/ 50 Mbps + Unlimited Calls",
+        "card_index": 89
+    },
+    {
+        "title": null,
+        "data_amount": "100",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "100 Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 90
+    },
+    {
+        "title": "Rs.7900",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.7900",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 91
+    },
+    {
+        "title": "Speed-based Fibre Unlimited Boost",
+        "data_amount": "300",
+        "bundle_name": "Fibre",
+        "price": " RRs.14900 Rs.0",
+        "speed": "300 Mbps",
+        "validity": null,
+        "description": "Data Bundle300FibreUnlimited Data300 Mbps/100 Mbps + Unlimited Calls",
+        "card_index": 92
+    },
+    {
+        "title": null,
+        "data_amount": "300",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "300 Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 93
+    },
+    {
+        "title": "Rs.14900",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.14900",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 94
+    },
+    {
+        "title": "Speed-based Fibre Unlimited Blast",
+        "data_amount": "600",
+        "bundle_name": "Fibre",
+        "price": " RRs.27900 Rs.0",
+        "speed": "600 Mbps",
+        "validity": null,
+        "description": "Data Bundle600FibreUnlimited Data600 Mbps/200 Mbps + Unlimited Calls",
+        "card_index": 95
+    },
+    {
+        "title": null,
+        "data_amount": "600",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "600 Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 96
+    },
+    {
+        "title": "Rs.27900",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.27900",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 97
+    },
+    {
+        "title": "Speed-based Fibre Unlimited Turbo",
+        "data_amount": "1000",
+        "bundle_name": "Fibre",
+        "price": " RRs.39900 Rs.0",
+        "speed": "1000 Mbps",
+        "validity": null,
+        "description": "Data Bundle1000FibreUnlimited Data1000 Mbps/300 Mbps + Unlimited Calls",
+        "card_index": 98
+    },
+    {
+        "title": null,
+        "data_amount": "1000",
+        "bundle_name": "Fibre",
+        "price": null,
+        "speed": "1000 Mbps",
+        "validity": null,
+        "description": null,
+        "card_index": 99
+    },
+    {
+        "title": "Rs.39900",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.39900",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 100
+    },
+    {
+        "title": null,
         "data_amount": "200GB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.75000Startup Fee:Rs.500"
+        "price": null,
+        "speed": "200GB",
+        "validity": null,
+        "description": null,
+        "card_index": 101
     },
     {
-        "title": "Ultra Prime",
-        "data_amount": "5TB",
-        "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.75000Startup Fee:Rs.500"
+        "title": "Rs.75000",
+        "data_amount": null,
+        "bundle_name": null,
+        "price": " RRs.75000",
+        "speed": null,
+        "validity": null,
+        "description": "Monthly Rental",
+        "card_index": 102
     },
     {
-        "title": "Ultra Prime",
+        "title": null,
         "data_amount": "5TB",
         "bundle_name": "Fibre",
-        "price": "Monthly RentalRs.75000Startup Fee:Rs.500"
+        "price": null,
+        "speed": null,
+        "validity": null,
+        "description": null,
+        "card_index": 103
     }
 ]

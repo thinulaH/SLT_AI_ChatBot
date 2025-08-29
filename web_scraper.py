@@ -18,16 +18,15 @@ MUST_SCRAPE_URLS = [
     "https://www.slt.lk/en/personal/broadband/fiber-unlimited",
     "https://www.slt.lk/en/personal/broadband/ftth/new-connection-charges",
     "https://www.slt.lk/en/personal/broadband/ftth/ftth-plans",
-    "https://www.slt.lk/en/broadband/packages",
     "https://www.slt.lk/en/broadband/extragb",
     "https://www.slt.lk/en/broadband/Fibre-speed"
 ]
 CHROMA_PERSIST_DIR = "./chroma_db"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
-MAX_CRAWL_DURATION = 60 * 5  # 10 minutes
-MAX_CRAWL_DEPTH = 5
+CHUNK_SIZE = 1500
+CHUNK_OVERLAP = 250
+MAX_CRAWL_DURATION = 60 * 20  # 20 minutes
+MAX_CRAWL_DEPTH = 3
 
 VISITED_URLS_FILE = "visited_urls.txt"
 

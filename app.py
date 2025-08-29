@@ -161,8 +161,7 @@ class SLTChatbot:
         """Determine if the query is related to broadband packages, excluding PEO TV and extra GB queries"""
         package_keywords = [
             "package", "plan", "broadband", "internet", "data",
-            "monthly", "unlimited", "gb", "fiber", "fibre", "4g", "adsl", "wifi"
-        ]
+            "monthly", "unlimited", "gb" ]
         peo_tv_keywords = ["peo tv", "peotv", "tv", "television", "channel", "channels"]
         extra_gb_keywords = ["extra gb", "additional data", "add-on data", "more data", 
                             "extra data", "data booster", "data add-on", "additional gb"]
@@ -176,6 +175,31 @@ class SLTChatbot:
         return (any(keyword in query_lower for keyword in package_keywords) and 
                 not is_peo_tv_query and 
                 not is_extra_gb_query)
+
+    def is_peo_tv_query(self, query):
+        """Determine if the query is specifically about PEO TV"""
+        peo_tv_keywords = ["peo tv", "peotv", "peo", "tv packages", "television packages", 
+                          "tv plans", "television plans", "channels", "peo channels"]
+        query_lower = query.lower()
+        return any(keyword in query_lower for keyword in peo_tv_keywords)
+
+    def is_non_broadband_query(self, query):
+        """Determine if query is about services other than broadband packages"""
+        return self.is_peo_tv_query(query) or any(keyword in query.lower() for keyword in [
+            "extra gb", "additional data", "add-on data", "branch", "location", "office",
+            "customer service", "bill", "payment", "support", "contact"
+        ])
+
+    def is_list_query(self, query):
+        """Determine if the query is asking for a comprehensive list"""
+        list_indicators = [
+            "list", "all packages", "all plans", "show me", "what packages", "what plans",
+            "available packages", "available plans", "package options", "plan options",
+            "tell me about", "give me", "show all", "display all", "complete list",
+            "full list", "entire list", "overview of", "summary of"
+        ]
+        query_lower = query.lower()
+        return any(indicator in query_lower for indicator in list_indicators)
 
     def preprocess_query(self, query):
         # Unchanged from original, but kept here for reference
@@ -196,7 +220,10 @@ class SLTChatbot:
         return query
 
     def find_relevant_chunks(self, query, top_n=3):
-        """Search both vector databases, prioritizing the appropriate one based on query type and supplementing with the other"""
+        """
+        Search both vector databases with better logic to prevent irrelevant mixing.
+        Prioritizes the correct database based on query type.
+        """
         if not self.vector_store:
             logger.warning("⚠️ General vector store not initialized")
             return []
@@ -204,60 +231,128 @@ class SLTChatbot:
         processed_query = self.preprocess_query(query)
         logger.info(f"🔍 Searching for: {processed_query}")
 
+        # Check if this is a list query - if so, get more results
+        is_list_query = self.is_list_query(query)
+        if is_list_query:
+            top_n = max(top_n, 6)  # Increase results for list queries
+            logger.info(f"📋 List query detected, expanding results to {top_n}")
+
         matched_chunks = []
         try:
-            if self.is_package_query(query) and self.packages_vector_store:
-                # Package query: Prioritize packages vector store
-                logger.info("🔍 Query detected as package-related, searching packages vector store")
-                package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=top_n)
-                for doc, score in package_results:
-                    matched_chunks.append({
-                        "title": doc.metadata.get("title", "Unknown Title"),
-                        "content": doc.page_content,
-                        "source": "https://www.slt.lk/en/broadband/packages",  # Fixed source for package results
-                        "score": score  # Store similarity score for prioritization
-                    })
-                logger.info(f"✅ Found {len(package_results)} package-specific chunks")
+            # Classify query types
+            is_fiber_query = "fibre" in query.lower() or "fiber" in query.lower()
+            is_package_query = self.is_package_query(query)
+            is_peo_tv_query = self.is_peo_tv_query(query)
+            is_non_broadband = self.is_non_broadband_query(query)
 
-                # Supplement with the most relevant document from general vector store
-                if self.vector_store and len(matched_chunks) < top_n:
-                    logger.info("🔍 Searching general vector store for supplementary results")
-                    general_results = self.vector_store.similarity_search_with_score(processed_query, k=1)  # Get top 1
-                    for doc, score in general_results:
-                        matched_chunks.append({
-                            "title": doc.metadata.get("title", "Unknown Title"),
-                            "content": doc.page_content,
-                            "source": doc.metadata.get("source", ""),  # Use original source
-                            "score": score
-                        })
-                    logger.info(f"✅ Added {len(general_results)} supplementary general chunks")
-            else:
-                # Non-package query (e.g., PEO TV, extra GB): Prioritize general vector store
-                logger.info("🔍 Query is non-package related, searching general vector store")
+            if is_peo_tv_query:
+                # PEO TV query: ONLY search general database, NO packages database
+                logger.info("📺 PEO TV query detected, searching ONLY general database")
                 general_results = self.vector_store.similarity_search_with_score(processed_query, k=top_n)
                 for doc, score in general_results:
                     matched_chunks.append({
                         "title": doc.metadata.get("title", "Unknown Title"),
                         "content": doc.page_content,
-                        "source": doc.metadata.get("source", ""),  # Use original source
-                        "score": score
+                        "source": doc.metadata.get("source", ""),
+                        "score": score,
+                        "db_source": "general"
+                    })
+                logger.info(f"✅ Found {len(general_results)} PEO TV-specific chunks")
+
+            elif is_fiber_query and self.packages_vector_store and not is_non_broadband:
+                logger.info("🔍 Fibre broadband query detected, prioritizing packages vector store")
+                
+                # Get Fibre-specific documents from the packages DB
+                search_k = top_n + 2 if is_list_query else top_n
+                package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=search_k)
+                for doc, score in package_results:
+                    if "fibre" in doc.page_content.lower() or "fiber" in doc.page_content.lower():
+                        matched_chunks.append({
+                            "title": doc.metadata.get("title", "Unknown Title"),
+                            "content": doc.page_content,
+                            "source": "https://www.slt.lk/en/broadband/packages",
+                            "score": score,
+                            "db_source": "packages"
+                        })
+                
+                # Get supplementary context from general DB only if needed and not enough results
+                if len(matched_chunks) < 2:
+                    logger.info("🔍 Getting minimal supplementary context from general database")
+                    general_results = self.vector_store.similarity_search_with_score(processed_query, k=1)
+                    for doc, score in general_results:
+                        matched_chunks.append({
+                            "title": doc.metadata.get("title", "Unknown Title"),
+                            "content": doc.page_content,
+                            "source": doc.metadata.get("source", ""),
+                            "score": score,
+                            "db_source": "general"
+                        })
+
+            elif is_package_query and self.packages_vector_store and not is_non_broadband:
+                # Broadband package query: Prioritize packages DB with minimal general supplementation
+                logger.info("🔍 Broadband package query detected, prioritizing packages database")
+                
+                # For list queries, get more package results, otherwise be conservative
+                if is_list_query:
+                    packages_slots = top_n  # Use most slots for packages in list queries
+                    general_slots = 1 if len(matched_chunks) < 3 else 0  # Minimal general context
+                else:
+                    packages_slots = max(2, top_n - 1)  # Leave room for 1 general
+                    general_slots = 1
+                
+                package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=packages_slots)
+                for doc, score in package_results:
+                    matched_chunks.append({
+                        "title": doc.metadata.get("title", "Unknown Title"),
+                        "content": doc.page_content,
+                        "source": "https://www.slt.lk/en/broadband/packages",
+                        "score": score,
+                        "db_source": "packages"
+                    })
+                logger.info(f"✅ Found {len(package_results)} package-specific chunks")
+
+                # Add minimal general context only if we have space and it's not a pure list query
+                if general_slots > 0 and len(matched_chunks) < top_n and not is_list_query:
+                    logger.info("🔍 Adding minimal general context")
+                    general_results = self.vector_store.similarity_search_with_score(processed_query, k=general_slots)
+                    for doc, score in general_results:
+                        matched_chunks.append({
+                            "title": doc.metadata.get("title", "Unknown Title"),
+                            "content": doc.page_content,
+                            "source": doc.metadata.get("source", ""),
+                            "score": score,
+                            "db_source": "general"
+                        })
+
+            else:
+                # Non-package/Non-PEO query OR general query: Prioritize general DB
+                logger.info("🔍 General/non-package query, searching general database primarily")
+                
+                general_results = self.vector_store.similarity_search_with_score(processed_query, k=top_n)
+                for doc, score in general_results:
+                    matched_chunks.append({
+                        "title": doc.metadata.get("title", "Unknown Title"),
+                        "content": doc.page_content,
+                        "source": doc.metadata.get("source", ""),
+                        "score": score,
+                        "db_source": "general"
                     })
                 logger.info(f"✅ Found {len(general_results)} general chunks")
 
-                # Supplement with the most relevant document from packages vector store
-                if self.packages_vector_store and len(matched_chunks) < top_n:
-                    logger.info("🔍 Searching packages vector store for supplementary results")
-                    package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=1)  # Get top 1
+                # Only add packages if we have very few results and it might be relevant
+                if len(matched_chunks) < 2 and self.packages_vector_store and not is_non_broadband:
+                    logger.info("🔍 Adding minimal package supplementation")
+                    package_results = self.packages_vector_store.similarity_search_with_score(processed_query, k=1)
                     for doc, score in package_results:
                         matched_chunks.append({
                             "title": doc.metadata.get("title", "Unknown Title"),
                             "content": doc.page_content,
-                            "source": "https://www.slt.lk/en/broadband/packages",  # Fixed source for package results
-                            "score": score
+                            "source": "https://www.slt.lk/en/broadband/packages",
+                            "score": score,
+                            "db_source": "packages"
                         })
-                    logger.info(f"✅ Added {len(package_results)} supplementary package chunks")
 
-            # Deduplicate chunks based on content and sort by similarity score
+            # Deduplicate chunks based on content and sort by relevance
             seen_content = set()
             unique_chunks = []
             for chunk in matched_chunks:
@@ -265,14 +360,39 @@ class SLTChatbot:
                     seen_content.add(chunk["content"])
                     unique_chunks.append(chunk)
 
-            # Sort by similarity score (lower is better) to prioritize primary database results
-            unique_chunks = sorted(unique_chunks, key=lambda x: x["score"])[:top_n]
+            # Sort by similarity score (lower is better for better relevance)
+            # But prioritize by database source for package queries
+            if is_package_query and not is_non_broadband:
+                # For package queries, prioritize packages DB results, then by score
+                unique_chunks = sorted(unique_chunks, key=lambda x: (
+                    0 if x["db_source"] == "packages" else 1,  # Packages first
+                    x["score"]  # Then by similarity score
+                ))
+            else:
+                # For non-package queries, just sort by score
+                unique_chunks = sorted(unique_chunks, key=lambda x: x["score"])
 
-            # Remove score from final output to maintain original chunk structure
+            # For list queries, be more generous with results, but respect query type
+            if is_list_query and (is_package_query or is_peo_tv_query):
+                final_limit = min(len(unique_chunks), 8)
+            else:
+                final_limit = top_n
+            
+            unique_chunks = unique_chunks[:final_limit]
+
+            # Remove internal metadata from final output
             for chunk in unique_chunks:
                 chunk.pop("score", None)
+                chunk.pop("db_source", None)
 
             logger.info(f"✅ Final count: {len(unique_chunks)} unique matching chunks")
+            
+            # Log the distribution for debugging
+            if unique_chunks and matched_chunks:
+                packages_count = sum(1 for chunk in matched_chunks if chunk.get("db_source") == "packages")
+                general_count = sum(1 for chunk in matched_chunks if chunk.get("db_source") == "general")
+                logger.info(f"📊 Result distribution: {packages_count} packages, {general_count} general")
+            
             return unique_chunks
 
         except Exception as e:
@@ -382,76 +502,15 @@ class SLTChatbot:
             response_text += f"- {link}\n"
         return response_text.strip()
 
-    def query_local_llm(self, user_query, context_chunks):
-        # Unchanged from original
-        try:
-            context_blocks = []
-            for chunk in context_chunks:
-                url = chunk['source']
-                title = chunk.get('title', 'No Title')
-                content = chunk['content'][:1500]
-                block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
-                context_blocks.append(block)
-
-            full_context = "\n\n---\n\n".join(context_blocks)
-            system_prompt = (
-                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
-                f"User question: {user_query}\n\n"
-                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
-                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
-            )
-
-            response = httpx.post(
-                "http://127.0.0.1:11434/api/chat",
-                json={
-                    "model": "gemma3:4b",
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_query}
-                    ],
-                    "stream": True
-                },
-                timeout=60
-            )
-
-            reply_text = "".join(json.loads(line)['message']['content'] for line in response.iter_lines() if line.strip())
-            return reply_text.strip()
-
-        except Exception as e:
-            logger.error(f"❌ Local LLM query failed: {e}")
-            return "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
-
-    def query_gemini_llm(self, user_query, context_chunks):
-        # Unchanged from original
-        try:
-            context_blocks = []
-            for chunk in context_chunks:
-                url = chunk['source']
-                title = chunk.get('title', 'No Title')
-                content = chunk['content'][:1500]
-                block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
-                context_blocks.append(block)
-
-            full_context = "\n\n---\n\n".join(context_blocks)
-            prompt = (
-                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
-                f"User question: {user_query}\n\n"
-                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
-                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
-            )
-
-            response = self.gemini_model.generate_content(prompt)
-            return response.text.strip()
-
-        except Exception as e:
-            logger.error(f"❌ Gemini LLM query failed: {e}")
-            return "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
-
     def query_llm(self, user_query, context_chunks, user_id):
-        # Unchanged from original, but included for reference
+        """Enhanced LLM query with better handling for list queries"""
         logger.info(f"🤖 Using {'Local LLM' if self.use_local_llm else 'Google Gemini'}")
         history = self.get_session_history(user_id)
         history_text = "\n".join([f"{h['role'].capitalize()}: {h['content']}" for h in history if h['role'] != "system"])
+        
+        # Check if this is a list query
+        is_list_query = self.is_list_query(user_query)
+        
         if self.use_local_llm:
             context_blocks = []
             for chunk in context_chunks:
@@ -461,13 +520,29 @@ class SLTChatbot:
                 block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
                 context_blocks.append(block)
             full_context = "\n\n---\n\n".join(context_blocks)
-            system_prompt = (
-                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
-                f"Conversation history:\n{history_text}\n\n"
-                f"User question: {user_query}\n\n"
-                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
-                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
-            )
+            
+            # Enhanced system prompt for list queries
+            if is_list_query:
+                system_prompt = (
+                    "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n"
+                    "The user is asking for a comprehensive list or overview. Provide detailed information about ALL the packages/options mentioned in the context.\n"
+                    "Format your response as a complete list with clear details for each item.\n"
+                    "Do not limit yourself to just 1-2 examples - include ALL relevant packages from the provided context.\n\n"
+                    f"Conversation history:\n{history_text}\n\n"
+                    f"User question: {user_query}\n\n"
+                    f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                    "Answer clearly and comprehensively. List ALL packages/plans mentioned in the context with their details. if ask only for names just give names only"
+                    "Do not provide links in your answer, as they will be added automatically."
+                )
+            else:
+                system_prompt = (
+                    "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
+                    f"Conversation history:\n{history_text}\n\n"
+                    f"User question: {user_query}\n\n"
+                    f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                    "Answer clearly and helpfully. Do not provide links in your answer(if specially ask for a link just give the link), as they will be added automatically."
+                )
+            
             try:
                 response = httpx.post(
                     "http://127.0.0.1:11434/api/chat",
@@ -479,7 +554,7 @@ class SLTChatbot:
                         ],
                         "stream": True
                     },
-                    timeout=60
+                    timeout=90 if is_list_query else 60  # More time for list queries
                 )
                 reply_text = "".join(json.loads(line)['message']['content'] for line in response.iter_lines() if line.strip())
             except Exception as e:
@@ -494,19 +569,36 @@ class SLTChatbot:
                 block = f"Page: {url}\nTitle: {title}\nContent:\n{content}"
                 context_blocks.append(block)
             full_context = "\n\n---\n\n".join(context_blocks)
-            prompt = (
-                "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
-                f"Conversation history:\n{history_text}\n\n"
-                f"User question: {user_query}\n\n"
-                f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
-                "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
-            )
+            
+            # Enhanced prompt for Gemini with list queries
+            if is_list_query:
+                prompt = (
+                    "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n"
+                    "The user is asking for a comprehensive list or overview. Provide detailed information about ALL the packages/options mentioned in the context.\n"
+                    "Format your response as a complete list with clear details for each item.\n"
+                    "Do not limit yourself to just 1-2 examples - include ALL relevant packages from the provided context.\n\n"
+                    f"Conversation history:\n{history_text}\n\n"
+                    f"User question: {user_query}\n\n"
+                    f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                    "Answer clearly and comprehensively. List ALL packages/plans mentioned in the context with their details. "
+                    "Do not provide links in your answer, as they will be added automatically."
+                )
+            else:
+                prompt = (
+                    "You are a helpful assistant answering questions about SLT (Sri Lanka Telecom) broadband, PEO TV, branches, and services.\n\n"
+                    f"Conversation history:\n{history_text}\n\n"
+                    f"User question: {user_query}\n\n"
+                    f"Based on the following extracted content from the SLT website:\n\n{full_context}\n\n"
+                    "Answer clearly and helpfully. Do not provide links in your answer, as they will be added automatically."
+                )
+            
             try:
                 response = self.gemini_model.generate_content(prompt)
                 reply_text = response.text.strip()
             except Exception as e:
                 logger.error(f"❌ Gemini LLM query failed: {e}")
                 reply_text = "❌ I couldn't generate a detailed response. Please visit the SLT website for more info."
+        
         self.add_to_session(user_id, "assistant", reply_text)
         return self._append_source_links(reply_text, context_chunks)
 
@@ -544,7 +636,6 @@ chatbot = SLTChatbot(
 )
 
 # === API Endpoints ===
-# All endpoints remain unchanged from the original code
 @app.route("/", methods=["GET"])
 def health():
     return jsonify({
@@ -654,7 +745,6 @@ def chat():
 
 @app.route("/location", methods=["POST"])
 def handle_location():
-    # Unchanged from original
     try:
         data = request.get_json()
         if not data:
@@ -692,7 +782,6 @@ def handle_location():
 
 @app.route("/search", methods=["POST"])
 def search():
-    # Unchanged from original
     try:
         data = request.get_json()
         query = data.get("query", "").strip()
