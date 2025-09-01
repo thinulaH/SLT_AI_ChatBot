@@ -1,9 +1,9 @@
-streamlit
+flask
 geopy
 google-generativeai
 sentence-transformers
 langchain
-beautifulsoup4
-playwright
-asyncio
+chromadb
+huggingface-hub
 httpx
+beautifulsoup4
