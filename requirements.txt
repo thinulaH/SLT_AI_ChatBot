@@ -1,9 +1,8 @@
-flask
+streamlit
+langchain
+langchain-community
+chromadb
+sentence-transformers
+torch
 geopy
 google-generativeai
-sentence-transformers
-langchain
-chromadb
-huggingface-hub
-httpx
-beautifulsoup4
