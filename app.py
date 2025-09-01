@@ -80,45 +80,30 @@ class SLTChatbot:
                 raise
 
     def init_vector_db(self):
-        """Initialize both general and packages vector databases"""
+        """Initialize vector databases in in-memory mode to bypass SQLite issues"""
         try:
-            # Initialize general vector database
-            db_paths = [
-                "./chroma_db",
-                "./slt_chroma_db",
-                "./slt_vector_db",
-                "../chroma_db"
-            ]
-            for db_path in db_paths:
-                if Path(db_path).exists():
-                    logger.info(f"🔍 Found general Chroma DB at: {db_path}")
-                    self.vector_store_path = db_path
-                    break
-
-            if not self.vector_store_path:
-                logger.warning("⚠️ No existing general Chroma DB found, creating new at ./chroma_db")
-                self.vector_store_path = "./chroma_db"
-
+            # In-memory general vector store
             self.embeddings = HuggingFaceEmbeddings(model_name='all-MiniLM-L6-v2')
             self.vector_store = Chroma(
-                persist_directory=self.vector_store_path,
-                embedding_function=self.embeddings
+                persist_directory=None,  # None → in-memory
+                embedding_function=self.embeddings,
+                collection_name="general_in_memory"
             )
             general_doc_count = self.vector_store._collection.count()
-            logger.info(f"✅ General vector store loaded with {general_doc_count} documents")
+            logger.info(f"✅ General vector store initialized in-memory with {general_doc_count} documents")
 
-            # Initialize packages vector database
+            # Packages vector store in-memory
             if Path(self.packages_vector_store_path).exists():
-                logger.info(f"🔍 Found packages Chroma DB at: {self.packages_vector_store_path}")
                 self.packages_vector_store = Chroma(
-                    persist_directory=self.packages_vector_store_path,
-                    embedding_function=self.embeddings
+                    persist_directory=None,  # in-memory
+                    embedding_function=self.embeddings,
+                    collection_name="packages_in_memory"
                 )
                 packages_doc_count = self.packages_vector_store._collection.count()
-                logger.info(f"✅ Packages vector store loaded with {packages_doc_count} documents")
+                logger.info(f"✅ Packages vector store initialized in-memory with {packages_doc_count} documents")
             else:
-                logger.warning(f"⚠️ Packages vector store not found at {self.packages_vector_store_path}")
                 self.packages_vector_store = None
+                logger.warning(f"⚠️ Packages vector store not found at {self.packages_vector_store_path}")
 
         except Exception as e:
             logger.error(f"❌ Failed to initialize vector stores: {e}")
