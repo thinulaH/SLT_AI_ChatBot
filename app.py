@@ -83,7 +83,10 @@ class SLTChatbot:
         """Initialize vector databases in in-memory mode to bypass SQLite issues"""
         try:
             # In-memory general vector store
-            self.embeddings = HuggingFaceEmbeddings(model_name='all-MiniLM-L6-v2')
+            self.embeddings = HuggingFaceEmbeddings(
+                model_name="sentence-transformers/paraphrase-MiniLM-L3-v2",
+                model_kwargs={"device": "cpu"}
+            )
             self.vector_store = Chroma(
                 persist_directory=None,  # None → in-memory
                 embedding_function=self.embeddings,
