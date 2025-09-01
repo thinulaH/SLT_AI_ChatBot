@@ -87,91 +87,47 @@ class SLTChatbot:
                 raise
 
     def init_vector_db(self):
-        """Initialize vector databases in in-memory mode and load persisted data"""
+        """Initialize vector databases, load persisted data if available, fallback to in-memory if not found"""
         try:
             from chromadb import Client
             from chromadb.config import Settings
+
             # Initialize embeddings
             self.embeddings = HuggingFaceEmbeddings(
                 model_name="sentence-transformers/paraphrase-MiniLM-L3-v2",
                 model_kwargs={"device": "cpu"}
             )
 
-            # --- General vector store in-memory ---
-            self.vector_store = Chroma(
-                persist_directory=None,
-                embedding_function=self.embeddings,
-                collection_name="general_in_memory"
-            )
-
-            # Load persisted general data if exists
+            # --- General vector store ---
             general_db_path = "./chroma_db"
             if Path(general_db_path).exists():
                 try:
-                    persisted_client = Client(Settings(persist_directory=general_db_path))
-                    persisted_collection = persisted_client.get_collection("default")
-                    persisted = persisted_collection.get()
-                    docs = persisted.get('documents', [])
-                    metadatas = persisted.get('metadatas', [])
-                    ids = persisted.get('ids', [])
-                    # Defensive: handle if docs is a list of str or list of dict
-                    if docs and isinstance(docs[0], dict):
-                        # If docs are dicts: {'document':..., 'metadata':..., 'id':...}
-                        for doc in docs:
-                            self.vector_store._collection.add(
-                                documents=[doc.get('document')],
-                                metadatas=[doc.get('metadata', {})],
-                                ids=[doc.get('id')]
-                            )
-                    else:
-                        # If docs are just texts, use corresponding metadata and ids
-                        for doc, meta, id_ in zip(docs, metadatas, ids):
-                            self.vector_store._collection.add(
-                                documents=[doc],
-                                metadatas=[meta if meta else {}],
-                                ids=[id_]
-                            )
+                    client = Client(Settings(persist_directory=general_db_path))
+                    self.vector_store = client.get_collection("default")
+                    general_doc_count = len(self.vector_store.get()['documents'])
+                    logger.info(f"✅ General vector store loaded from persisted DB with {general_doc_count} documents")
                 except Exception as e:
                     logger.warning(f"⚠️ Could not load general persisted Chroma DB: {e}")
+                    self.vector_store = Client(Settings(persist_directory=None)).get_or_create_collection("general_in_memory")
+                    logger.info("✅ General vector store initialized in-memory")
+            else:
+                self.vector_store = Client(Settings(persist_directory=None)).get_or_create_collection("general_in_memory")
+                logger.info("✅ General vector store initialized in-memory")
 
-            general_doc_count = self.vector_store._collection.count()
-            logger.info(f"✅ General vector store initialized in-memory with {general_doc_count} documents")
-
-            # --- Packages vector store in-memory ---
-            self.packages_vector_store = Chroma(
-                persist_directory=None,
-                embedding_function=self.embeddings,
-                collection_name="packages_in_memory"
-            )
-
-            # Load persisted packages data if exists
+            # --- Packages vector store ---
             if Path(self.packages_vector_store_path).exists():
                 try:
-                    persisted_client = Client(Settings(persist_directory=self.packages_vector_store_path))
-                    persisted_collection = persisted_client.get_collection("default")
-                    persisted = persisted_collection.get()
-                    docs = persisted.get('documents', [])
-                    metadatas = persisted.get('metadatas', [])
-                    ids = persisted.get('ids', [])
-                    if docs and isinstance(docs[0], dict):
-                        for doc in docs:
-                            self.packages_vector_store._collection.add(
-                                documents=[doc.get('document')],
-                                metadatas=[doc.get('metadata', {})],
-                                ids=[doc.get('id')]
-                            )
-                    else:
-                        for doc, meta, id_ in zip(docs, metadatas, ids):
-                            self.packages_vector_store._collection.add(
-                                documents=[doc],
-                                metadatas=[meta if meta else {}],
-                                ids=[id_]
-                            )
+                    client = Client(Settings(persist_directory=self.packages_vector_store_path))
+                    self.packages_vector_store = client.get_collection("default")
+                    packages_doc_count = len(self.packages_vector_store.get()['documents'])
+                    logger.info(f"✅ Packages vector store loaded from persisted DB with {packages_doc_count} documents")
                 except Exception as e:
                     logger.warning(f"⚠️ Could not load packages persisted Chroma DB: {e}")
-
-            packages_doc_count = self.packages_vector_store._collection.count()
-            logger.info(f"✅ Packages vector store initialized in-memory with {packages_doc_count} documents")
+                    self.packages_vector_store = Client(Settings(persist_directory=None)).get_or_create_collection("packages_in_memory")
+                    logger.info("✅ Packages vector store initialized in-memory")
+            else:
+                self.packages_vector_store = Client(Settings(persist_directory=None)).get_or_create_collection("packages_in_memory")
+                logger.info("✅ Packages vector store initialized in-memory")
 
         except Exception as e:
             logger.error(f"❌ Failed to initialize vector stores: {e}")
