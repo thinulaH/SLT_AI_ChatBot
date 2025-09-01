@@ -1,21 +1,15 @@
+import streamlit as st
+import os
+import logging
+from datetime import datetime
 import re
 import json
-import os
 from pathlib import Path
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
-from datetime import datetime
-import logging
-
 # Langchain for vector store
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
-
-# Ollama client (local LLM)
-import httpx
-
 # Google Gemini
 import google.generativeai as genai
 
@@ -23,12 +17,11 @@ import google.generativeai as genai
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize Flask
-app = Flask(__name__)
-CORS(app)
+
+# ---- SLTChatbot class (retain all logic as before) ----
 
 class SLTChatbot:
-    def __init__(self, use_local_llm=True, gemini_api_key="AIzaSyDM3eplzc4SQTLD6h556NTWEZKsmNbjKuY"):
+    def __init__(self, use_local_llm=True, gemini_api_key="AIzaSyCjS3Uj_ZdQX4TnSjx1CmCPMkLsc4sM0_4"):
         self.use_local_llm = use_local_llm
         self.gemini_api_key = gemini_api_key
         self.gemini_model = None
@@ -688,93 +681,64 @@ class SLTChatbot:
             self.gemini_api_key = gemini_api_key
         self.setup_llm()
 
-# Configuration
-USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDM3eplzc4SQTLD6h556NTWEZKsmNbjKuY")
+# ---- Streamlit UI ----
 
-# Initialize chatbot
+# Force use Google Gemini
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyCjS3Uj_ZdQX4TnSjx1CmCPMkLsc4sM0_4")
+
+# Initialize chatbot with Gemini only
 chatbot = SLTChatbot(
-    use_local_llm=USE_LOCAL_LLM,
+    use_local_llm=False,  # Force Gemini
     gemini_api_key=GEMINI_API_KEY
 )
 
-# === API Endpoints ===
-@app.route("/", methods=["GET"])
-def health():
-    return jsonify({
-        "status": "✅ SLT Chatbot API is running",
-        "timestamp": datetime.now().isoformat(),
-        "branches_loaded": len(chatbot.branches),
-        "vector_db_documents": (
-            (chatbot.vector_store._collection.count() if chatbot.vector_store else 0) +
-            (chatbot.packages_vector_store._collection.count() if chatbot.packages_vector_store else 0)
-        ),
-        "embedding_model": "all-MiniLM-L6-v2",
-        "llm_type": "Local LLM (Ollama)" if chatbot.use_local_llm else "Google Gemini",
-        "gemini_configured": chatbot.gemini_api_key is not None
-    })
+# Streamlit page settings
+st.set_page_config(page_title="SLT AI Chatbot", page_icon="💬", layout="wide")
+st.title("💬 SLT AI Chatbot")
 
-@app.route("/switch-llm", methods=["POST"])
-def switch_llm():
-    try:
-        data = request.get_json()
-        use_local_llm = data.get("use_local_llm", True)
-        gemini_api_key = data.get("gemini_api_key", None)
+# Sidebar for settings (debug only)
+with st.sidebar:
+    st.header("⚙️ Settings")
+    debug_mode = st.checkbox("Debug mode", value=(os.environ.get("DEBUG", "true").lower() == "true"))
+
+# Initialize session state for messages
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+# User input
+if prompt := st.chat_input("Ask me something..."):
+    user_id = "default"
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
     
-        if not use_local_llm and not gemini_api_key and not chatbot.gemini_api_key:
-            return jsonify({
-                "error": "❌ Gemini API key is required when switching to Google Gemini"
-            }), 400
+    chatbot.add_to_session(user_id, "user", prompt)
+
+    # Casual replies
+    casual_replies = {
+        "hello": "👋 Hello! I'm your SLT assistant. How can I help you today?",
+        "hi": "Hi there! Ask me about SLT broadband packages, PEO TV, or branch locations.",
+        "hey": "Hey! What would you like to know about SLT services?",
+        "thanks": "You're welcome! Anything else I can help with?",
+        "thank you": "Happy to help! Is there anything else about SLT services you'd like to know?",
+        "bye": "Goodbye! Have a great day!",
+        "goodbye": "Take care! Feel free to come back if you have more questions."
+    }
     
-        chatbot.switch_llm(use_local_llm, gemini_api_key)
-    
-        return jsonify({
-            "status": "✅ LLM switched successfully",
-            "current_llm": "Local LLM (Ollama)" if chatbot.use_local_llm else "Google Gemini"
-        })
-    
-    except Exception as e:
-        logger.error(f"❌ Error switching LLM: {e}")
-        return jsonify({
-            "error": f"❌ Failed to switch LLM: {str(e)}"
-        }), 500
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "❌ No JSON data provided"}), 400
-        
-        user_input = data.get("message", "").strip()
-        user_id = data.get("user_id", "default")
-        
-        if not user_input:
-            return jsonify({"error": "❌ Empty message provided"}), 400
-
-        logger.info(f"💬 User query: {user_input}")
-        user_lower = user_input.lower()
-
-        # Store user input in session
-        chatbot.add_to_session(user_id, "user", user_input)
-
-        # Handle casual replies first
-        casual_replies = {
-            "hello": "👋 Hello! I'm your SLT assistant. How can I help you today?",
-            "hi": "Hi there! Ask me about SLT broadband packages, PEO TV, or branch locations.",
-            "hey": "Hey! What would you like to know about SLT services?",
-            "thanks": "You're welcome! Anything else I can help with?",
-            "thank you": "Happy to help! Is there anything else about SLT services you'd like to know?",
-            "bye": "Goodbye! Have a great day!",
-            "goodbye": "Take care! Feel free to come back if you have more questions."
-        }
-        
-        if user_lower in casual_replies:
-            response = casual_replies[user_lower]
-            chatbot.add_to_session(user_id, "assistant", response)
-            return jsonify({"reply": response})
-
-        # Handle location queries
+    user_lower = prompt.lower()
+    if user_lower in casual_replies:
+        response = casual_replies[user_lower]
+        chatbot.add_to_session(user_id, "assistant", response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        with st.chat_message("assistant"):
+            st.markdown(response)
+    else:
+        # Location queries
         location_keywords = ["branch", "location", "office", "near", "address", "where", "closest", "nearby"]
         user_words = user_lower.split()
         is_location_query = any(word in user_words for word in location_keywords)
@@ -784,155 +748,28 @@ def chat():
             if found_city:
                 logger.info(f"📍 Specific city query detected: {found_city}")
                 response = chatbot.handle_location_query(found_city)
-                chatbot.add_to_session(user_id, "assistant", response)
-                return jsonify({"reply": response})
-            elif any(phrase in user_lower for phrase in ["near me", "my location", "closest", "nearby"]):
-                response = ("📍 To find the nearest SLT branches, I need your location.\n\n"
-                          "**Options:**\n"
-                          "1️⃣ **Share your location** (most accurate)\n"
-                          "2️⃣ **Tell me your city/area** (e.g., 'Colombo', 'Kandy', 'Galle')\n\n"
-                          "🔒 *Your location data is only used to find nearby branches and is not stored.*")
-                chatbot.add_to_session(user_id, "assistant", response)
-                return jsonify({
-                    "reply": response,
-                    "request_location": True
-                })
-
-        # Handle package and other queries using the appropriate vector store
-        chunks = chatbot.find_relevant_chunks(user_input, top_n=5)
-        if not chunks:
-            response = ("❌ I couldn't find specific information about that topic. \n\n"
-                       "🔗 **Try visiting:**\n"
-                       "- https://www.slt.lk/en/broadband/packages\n"
-                       "- https://www.slt.lk/en/peo-tv/packages\n"
-                       "- **Customer Service:** 1212")
+            else:
+                response = ("📍 To find the nearest SLT branches, please share your city or area (e.g., 'Colombo', 'Kandy', 'Galle').\n\n"
+                            "🔒 *Your location data is only used to find nearby branches and is not stored.*")
             chatbot.add_to_session(user_id, "assistant", response)
-            return jsonify({"reply": response})
-
-        llm_response = chatbot.query_llm(user_input, chunks, user_id)
-        return jsonify({
-            "reply": llm_response,
-            "llm_used": "Local LLM (Ollama)" if chatbot.use_local_llm else "Google Gemini"
-        })
-
-    except Exception as e:
-        logger.error(f"❌ Chat error: {e}", exc_info=True)
-        return jsonify({
-            "error": "❌ Sorry, I encountered an error. Please try again.",
-            "details": str(e) if app.debug else None
-        }), 500
-
-@app.route("/location", methods=["POST"])
-def handle_location():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "❌ No JSON data provided"}), 400
-    
-        latitude = data.get("latitude")
-        longitude = data.get("longitude")
-        user_id = data.get("user_id", "default")
-    
-        if not latitude or not longitude:
-            return jsonify({"error": "❌ Latitude and longitude are required"}), 400
-    
-        try:
-            lat = float(latitude)
-            lng = float(longitude)
-            user_coords = (lat, lng)
-        except (ValueError, TypeError):
-            return jsonify({"error": "❌ Invalid coordinates provided"}), 400
-    
-        if not (5.5 <= lat <= 10.0 and 79.0 <= lng <= 82.0):
-            return jsonify({
-                "error": "❌ Location appears to be outside Sri Lanka. Please check your coordinates or enter your city manually."
-            }), 400
-    
-        logger.info(f"📍 Processing location request: {lat}, {lng}")
-    
-        response = chatbot.handle_location_query("", user_coords=user_coords)
-        chatbot.add_to_session(user_id, "assistant", response)
-        return jsonify({"reply": response})
-    
-    except Exception as e:
-        logger.error(f"❌ Location processing error: {e}")
-        return jsonify({
-            "error": "❌ Sorry, I encountered an error processing your location. Please try entering your city manually.",
-            "details": str(e) if app.debug else None
-        }), 500
-
-@app.route("/search", methods=["POST"])
-def search():
-    try:
-        data = request.get_json()
-        query = data.get("query", "").strip()
-        top_n = data.get("top_n", 5)
-        
-        if not query:
-            return jsonify({"error": "❌ No query provided"}), 400
-        
-        chunks = chatbot.find_relevant_chunks(query, top_n=top_n)
-        return jsonify({
-            "query": query,
-            "results": chunks,
-            "total_found": len(chunks)
-        })
-        
-    except Exception as e:
-        logger.error(f"❌ Search error: {e}")
-        return jsonify({"error": f"❌ Search failed: {str(e)}"}), 500
-
-@app.route("/clear-session", methods=["POST"])
-def clear_session():
-    try:
-        data = request.get_json()
-        user_id = data.get("user_id", "default")
-        
-        if user_id in chatbot.sessions:
-            del chatbot.sessions[user_id]
-            return jsonify({"status": "✅ Session cleared successfully"})
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            with st.chat_message("assistant"):
+                st.markdown(response)
         else:
-            return jsonify({"status": "ℹ️ No session found to clear"})
-    
-    except Exception as e:
-        logger.error(f"❌ Clear session error: {e}")
-        return jsonify({"error": f"❌ Failed to clear session: {str(e)}"}), 500
-
-@app.route("/session-history", methods=["POST"])
-def get_session_history():
-    try:
-        data = request.get_json()
-        user_id = data.get("user_id", "default")
-        
-        history = chatbot.get_session_history(user_id)
-        return jsonify({
-            "user_id": user_id,
-            "history": history,
-            "message_count": len(history)
-        })
-    
-    except Exception as e:
-        logger.error(f"❌ Session history error: {e}")
-        return jsonify({"error": f"❌ Failed to get session history: {str(e)}"}), 500
-
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({"error": "❌ Endpoint not found"}), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    return jsonify({"error": "❌ Internal server error"}), 500
-
-# Start app
-if __name__ == "__main__":
-    logger.info("🚀 Starting Enhanced SLT Chatbot API server...")
-    logger.info(f"📊 General vector store: {chatbot.vector_store._collection.count() if chatbot.vector_store else 0} documents loaded")
-    logger.info(f"📊 Packages vector store: {chatbot.packages_vector_store._collection.count() if chatbot.packages_vector_store else 0} documents loaded")
-    logger.info(f"🌍 Branch data: {len(chatbot.branches)} locations loaded")
-    logger.info(f"🤖 LLM: {'Local LLM (Ollama)' if chatbot.use_local_llm else 'Google Gemini'}")
-    
-    app.run(
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 4321)),
-        debug=os.environ.get("DEBUG", "true").lower() == "true"
-    )
+            # General/package queries
+            chunks = chatbot.find_relevant_chunks(prompt, top_n=5)
+            if not chunks:
+                response = ("❌ I couldn't find specific information about that topic. \n\n"
+                            "🔗 **Try visiting:**\n"
+                            "- https://www.slt.lk/en/broadband/packages\n"
+                            "- https://www.slt.lk/en/peo-tv/packages\n"
+                            "- **Customer Service:** 1212")
+                chatbot.add_to_session(user_id, "assistant", response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                with st.chat_message("assistant"):
+                    st.markdown(response)
+            else:
+                llm_response = chatbot.query_llm(prompt, chunks, user_id)
+                st.session_state.messages.append({"role": "assistant", "content": llm_response})
+                with st.chat_message("assistant"):
+                    st.markdown(llm_response)

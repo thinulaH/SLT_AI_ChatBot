@@ -1,5 +1,5 @@
 # Ignore chroma DB folder
-chroma_db/
+# chroma_db/
 
 # macOS system files
 .DS_Store
