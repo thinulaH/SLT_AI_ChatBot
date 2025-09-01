@@ -6,3 +6,4 @@ sentence-transformers
 torch
 geopy
 google-generativeai
+pysqlite3-binary
